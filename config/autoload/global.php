@@ -14,8 +14,8 @@
 return array(
     'db' => array(
         'driver'         => 'Mysqli',
-        'database'       => 'hecflore_CELO',
-        'hostname'       =>'gator4045.hostgator.com',
+        'database'       => 'CELO',
+        'hostname'       =>'localhost',
         'driver_options' => array(
             MYSQLI_INIT_COMMAND => 'SET NAMES \'UTF8\''
         ),
