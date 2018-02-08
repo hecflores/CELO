@@ -18,7 +18,7 @@ class UserHomePage extends UserRenderChooser
         UserInfo:React.PropTypes.object
     };
     renderForStaff(){
-        return <Layout Template={StaffLayoutTemplate} PageTitle={"Student Home"}>
+        return <Layout Template={StaffLayoutTemplate} PageTitle={"Instructor Home"}>
 
                     <Layout.Body>
                         <SimpleContainer>
@@ -48,7 +48,7 @@ class UserHomePage extends UserRenderChooser
 
     }
     renderForStudent(){
-        return <Layout Template={StaffLayoutTemplate} PageTitle={"Instructor Home"}>
+        return <Layout Template={StaffLayoutTemplate} PageTitle={"Student Home"}>
 
                     <Layout.Body>
                         <SimpleContainer>
