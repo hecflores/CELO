@@ -53,7 +53,7 @@ class UserSessionTable
         $data = array(
             'SessionID' => uniqid(),
             'UserID' => $user->getUserID(),
-            'TimeLastAccessed'  => "NOW()",
+            'TimeLastAccessed'  => date("y-m-d h:m:s"),
             'MAC_Address' => isset($_SERVER['SERVER_ADDR'])?$_SERVER['SERVER_ADDR']:"Unkown",
             'Role' => $user->getRole(),
         );
