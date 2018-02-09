@@ -1,39 +1,109 @@
-DROP TABLE Questions;
-DROP TABLE QuestionTypes;
-DROP TABLE CourseContent;
-DROP TABLE SectionUsers;
-DROP TABLE Sections;
-DROP TABLE Courses;
-DROP TABLE CourseStatus;
-DROP TABLE UserSessions;
-DROP TABLE Invitation;
-DROP TABLE InvitationReasons;
-DROP TABLE Users;
-DROP TABLE AnswerableQuestions;
-DROP TABLE AnswerableQuestionsGroups;
-DROP TABLE AnsweredQuestions;
-DROP TABLE AnsweringQuestionsGroup;
-DROP TABLE AssessmentQuestions;
-DROP TABLE Assessments;
-DROP TABLE CourseContentChildren;
-DROP TABLE CourseContentTemplates;
-DROP TABLE CourseContentTest;
-DROP TABLE Files;
-DROP TABLE Numbers;
-DROP TABLE QuestionsBackup;
-DROP TABLE QuestionsPool;
-DROP TABLE QuestionsPoolUsers;
-DROP TABLE RunningAssessments;
-DROP TABLE Tags;
+USE CELO;
 
 
+DROP PROCEDURE  RemoveAllTables;
+DELIMITER //
+CREATE PROCEDURE RemoveAllTables()
+  BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE TableName VARCHAR(100);
+    DECLARE sqlString VARCHAR(200);
+    DECLARE tablesCursor CURSOR FOR SELECT table_name FROM information_schema.tables where table_schema='CELO';
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN tablesCursor;
+
+    read_loop: LOOP
+      FETCH tablesCursor INTO TableName;
+      IF done THEN
+        LEAVE read_loop;
+      END IF;
+      SET @sqlString = CONCAT('DROP TABLE ',TableName);
+      PREPARE stmt FROM @sqlString;
+      EXECUTE stmt;
+
+    END LOOP;
+
+    CLOSE tablesCursor;
+
+  END;
+//
+DELIMITER ;
+
+DROP PROCEDURE  RemoveAllViews;
+
+DELIMITER //
+CREATE PROCEDURE RemoveAllViews()
+  BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE ViewName VARCHAR(100);
+    DECLARE sqlString VARCHAR(200);
+    DECLARE viewsCursor CURSOR FOR SELECT TABLE_NAME FROM information_schema.`TABLES` WHERE TABLE_TYPE LIKE 'VIEW' AND TABLE_SCHEMA LIKE 'CELO';
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN viewsCursor;
+
+    read_loop: LOOP
+      FETCH viewsCursor INTO ViewName;
+      IF done THEN
+        LEAVE read_loop;
+      END IF;
+      SET @sqlString = CONCAT('DROP VIEW ',ViewName);
+      PREPARE stmt FROM @sqlString;
+      EXECUTE stmt;
+
+    END LOOP;
+
+    CLOSE viewsCursor;
+
+  END;
+//
+DELIMITER ;
+
+DROP PROCEDURE  RemoveAllForeignKeys;
+
+DELIMITER //
+CREATE PROCEDURE RemoveAllForeignKeys()
+  BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE TableName VARCHAR(100);
+    DECLARE sqlString VARCHAR(200);
+    DECLARE ConstraintName VARCHAR(100);
+    DECLARE foreignKeysCursor CURSOR FOR select constraint_name, table_name from information_schema.table_constraints where constraint_schema = 'CELO' AND constraint_type = 'FOREIGN KEY';
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN foreignKeysCursor;
+
+    read_loop: LOOP
+      FETCH foreignKeysCursor INTO ConstraintName, TableName;
+      IF done THEN
+        LEAVE read_loop;
+      END IF;
+      SET @sqlString = CONCAT('ALTER TABLE ',TableName,' DROP FOREIGN KEY ',ConstraintName);
+      PREPARE stmt FROM @sqlString;
+      EXECUTE stmt;
+
+    END LOOP;
+
+    CLOSE foreignKeysCursor;
+
+  END;
+//
+DELIMITER ;
+
+
+
+
+CALL RemoveAllForeignKeys;
+CALL RemoveAllViews;
+CALL RemoveAllTables;
 
 
 
 /**************************************************************************/
 /* Users                                                                  */
 /**************************************************************************/
-DROP TABLE Users;
+
 CREATE TABLE Users
 (
   UserID varchar(36),
@@ -47,13 +117,13 @@ CREATE TABLE Users
   UHID CHAR(7),
   Properties TEXT,
   PRIMARY KEY(UserID)
-) ENGINE=innodb;
+);
 
 
 /**************************************************************************/
 /* User Sessions                                                          */
 /**************************************************************************/
-DROP TABLE UserSessions;
+
 CREATE TABLE UserSessions
 (
   SessionID varchar(36),
@@ -63,13 +133,13 @@ CREATE TABLE UserSessions
   Role VARCHAR(50),
   PRIMARY KEY(SessionID),
   FOREIGN KEY(UserID) REFERENCES Users(UserID) ON DELETE CASCADE
-) ENGINE=innodb;
+);
 
 /**************************************************************************/
 /* Questions                                                              */
 /* We want to have a question pool that holds these questions             */
 /**************************************************************************/
-DROP TABLE QuestionsPool;
+
 CREATE TABLE QuestionsPool
 (
   QuestionsPoolID BIGINT NOT NULL AUTO_INCREMENT,
@@ -87,8 +157,7 @@ ALTER TABLE QuestionsPool MODIFY COLUMN ParentQuestionPool BIGINT  NULL,
 
 
 
-DROP TABLE QuestionsPoolUsers;
-SET FOREIGN_KEY_CHECKS = 0;
+
 CREATE TABLE QuestionsPoolUsers
 (
   QuestionsPoolID BIGINT,
@@ -97,11 +166,10 @@ CREATE TABLE QuestionsPoolUsers
   Privilege VARCHAR(100),
   PRIMARY KEY (QuestionsPoolID,UserID),
   FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
-) ENGINE=innodb;
+);
 
-DROP TABLE Questions;
 
-SET FOREIGN_KEY_CHECKS = 0;
+
 CREATE TABLE Questions
 (
   QuestionID BIGINT(20) NOT NULL AUTO_INCREMENT,
@@ -114,11 +182,11 @@ CREATE TABLE Questions
   PRIMARY KEY(QuestionID),
   FOREIGN KEY(CreatedBy) REFERENCES Users(UserID),
   FOREIGN KEY(QuestionsPoolID) REFERENCES QuestionsPool(QuestionsPoolID) ON DELETE CASCADE
-) ENGINE=innodb;
+);
 /**************************************************************************/
 /* Course                                                                */
 /**************************************************************************/
-DROP TABLE Courses;
+
 CREATE TABLE Courses
 (
   CourseUniqueID BIGINT AUTO_INCREMENT NOT NULL ,
@@ -132,13 +200,35 @@ CREATE TABLE Courses
   Properties TEXT,
   PRIMARY KEY(CourseUniqueID),
   FOREIGN KEY(CreatedBy) REFERENCES Users(UserID)
-) ENGINE=innodb;
+);
 
 
+CREATE TABLE CourseContent
+(
+  ContentID BIGINT NOT NULL AUTO_INCREMENT,
+  CourseContentNumber BIGINT ,
+  SectionID BIGINT NOT NULL,
+  Name VARCHAR(200),
+  URL VARCHAR(200),
+  Description VARCHAR(1000),
+  ParentFolderID BIGINT NULL ,
+  RootContentID BIGINT NULL ,
+  Depth INTEGER,
+  Type VARCHAR(200),
+  Properties TEXT,
+  Gradable BOOL,
+  CreatedBy VARCHAR(36),
+  RolesVisible VARCHAR(200), /* Role1|Role2|Role3 */
+
+
+  PRIMARY KEY(ContentID),
+  FOREIGN KEY(CreatedBy) REFERENCES Users(UserID) ON  DELETE CASCADE
+
+);
 /**************************************************************************/
 /* Section                                                                */
 /**************************************************************************/
-DROP TABLE Sections;
+
 CREATE TABLE Sections
 (
   SectionID BIGINT UNIQUE AUTO_INCREMENT NOT NULL ,
@@ -155,13 +245,13 @@ CREATE TABLE Sections
   FOREIGN KEY(CourseUniqueID) REFERENCES Courses(CourseUniqueID) ON DELETE CASCADE,
   FOREIGN KEY(MainCourseContentID) REFERENCES CourseContent(ContentID) ON DELETE CASCADE
 
-) ENGINE=innodb;
+);
 
 DELETE FROM Courses;
 /**************************************************************************/
 /* Section Users                                                          */
 /**************************************************************************/
-DROP TABLE SectionUsers;
+
 CREATE TABLE SectionUsers
 (
   SectionUsersID BIGINT AUTO_INCREMENT,
@@ -175,23 +265,23 @@ CREATE TABLE SectionUsers
   FOREIGN KEY(SectionID) REFERENCES Sections(SectionID) ON DELETE CASCADE,
   FOREIGN KEY(UserID) REFERENCES Users(UserID) ON DELETE CASCADE,
   FOREIGN KEY(AssignedBy) REFERENCES Users(UserID) ON  DELETE CASCADE
-) ENGINE=innodb;
+);
 /**************************************************************************/
 /* Invitation Reasons                                                     */
 /**************************************************************************/
-DROP TABLE InvitationReasons;
+
 CREATE TABLE InvitationReasons
 (
   ReasonID VARCHAR(10),
   ReasonString VARCHAR(200),
   RolesExcepted VARCHAR(200),
   PRIMARY KEY (ReasonID)
-) ENGINE=innodb;
+);
 
 /**************************************************************************/
 /* Invitation                                                             */
 /**************************************************************************/
-DROP TABLE Invitation;
+
 CREATE TABLE Invitation
 (
   InvitationID varchar(36),
@@ -206,58 +296,26 @@ CREATE TABLE Invitation
   FOREIGN KEY(Inviting) REFERENCES Users(UserID) ON UPDATE CASCADE ON DELETE CASCADE,
   FOREIGN KEY(InvitedBy) REFERENCES Users(UserID) ON UPDATE CASCADE ON DELETE CASCADE,
   FOREIGN KEY(ReasonID) REFERENCES InvitationReasons(ReasonID) ON UPDATE CASCADE ON DELETE CASCADE
-) ENGINE=innodb;
-DROP TABLE Tags;
+);
+
 
 
 /**************************************************************************/
 /* Section Folders                                                        */
 /**************************************************************************/
-DROP TABLE CourseContent;
-CREATE TABLE CourseContent
-(
-  ContentID BIGINT NOT NULL AUTO_INCREMENT,
-  CourseContentNumber BIGINT ,
-  SectionID BIGINT NOT NULL,
-  Name VARCHAR(200),
-  URL VARCHAR(200),
-  Description VARCHAR(1000),
-  ParentFolderID BIGINT,
-  RootContentID BIGINT,
-  Depth INTEGER,
-  Type VARCHAR(200),
-  Properties TEXT,
-  Gradable BOOL,
-  CreatedBy VARCHAR(36),
-  RolesVisible VARCHAR(200), /* Role1|Role2|Role3 */
 
-
-  PRIMARY KEY(CourseContentNumber,SectionID),
-  FOREIGN KEY(CreatedBy) REFERENCES Users(UserID) ON  DELETE CASCADE
-
-) ENGINE=innodb;
-
-ALTER TABLE CourseContent DROP FOREIGN KEY fk_ParentFolderID;
-ALTER TABLE CourseContent DROP FOREIGN KEY fk_CourseContent_ParentFolderID;
-ALTER TABLE CourseContent DROP FOREIGN KEY fk_CourseContent_RootContentID;
+SET FOREIGN_KEY_CHECKS=1;
 
 ALTER TABLE CourseContent
   ADD CONSTRAINT fk_ParentFolderID
 FOREIGN KEY(SectionID) REFERENCES Sections(SectionID) ON DELETE CASCADE;
 
-ALTER TABLE CourseContent
-  ADD CONSTRAINT fk_CourseContent_ParentFolderID
-FOREIGN KEY(ParentFolderID) REFERENCES CourseContent(ContentID) ON DELETE CASCADE;
-
-ALTER TABLE CourseContent
-  ADD CONSTRAINT fk_CourseContent_RootContentID
-FOREIGN KEY(RootContentID) REFERENCES CourseContent(ContentID) ON DELETE CASCADE;
 
 
 /***************************************************************************/
 /* Files                                                                   */
 /***************************************************************************/
-DROP TABLE Files;
+
 CREATE TABLE Files(
   FileID varchar(36),
   Path VARCHAR(200),
@@ -266,10 +324,10 @@ CREATE TABLE Files(
   CreatedBy VARCHAR(36),
   FOREIGN KEY(CreatedBy) REFERENCES Users(UserID),
   PRIMARY KEY(FileID)
-) ENGINE=innodb;
+);
 
 
-DROP TABLE CourseContentTemplates;
+
 CREATE TABLE CourseContentTemplates
 (
   TemplateID BIGINT NOT NULL AUTO_INCREMENT,
@@ -285,15 +343,15 @@ CREATE TABLE CourseContentTemplates
 
 
 
-) ENGINE=innodb;
-DROP PROCEDURE SaveAsTemplate;
+);
+
 
 
 /***************************************************************************/
 /* Answerable Question Group                                               */
 /* Holds the Basic Connections Between a collection of questions           */
 /***************************************************************************/
-DROP TABLE AnswerableQuestionsGroups;
+
 CREATE TABLE AnswerableQuestionsGroups(
   AnswerableGroupID BIGINT NOT NULL AUTO_INCREMENT ,
   CreatedOn DATETIME,
@@ -308,9 +366,9 @@ CREATE TABLE AnswerableQuestionsGroups(
   FOREIGN KEY(CourseContentID) REFERENCES CourseContent(ContentID) ON DELETE CASCADE,
   FOREIGN KEY(CreatedBy) REFERENCES Users(UserID) ON DELETE CASCADE
   /*, FOREIGN KEY(TypeID) REFERENCES AnswerableQuestionsGroupTypes(GroupID) ON UPDATE CASCADE ON DELETE CASCADE */
-) ENGINE=innodb;
+);
 
-DROP TABLE AnsweringQuestionsGroup;
+
 CREATE TABLE AnsweringQuestionsGroup(
   AnsweringGroupID BIGINT NOT NULL AUTO_INCREMENT,
   AnswerableGroupID BIGINT,
@@ -321,7 +379,7 @@ CREATE TABLE AnsweringQuestionsGroup(
   PRIMARY KEY(AnsweringGroupID),
   FOREIGN KEY(StartedBy) REFERENCES Users(UserID) ON UPDATE CASCADE ON DELETE CASCADE,
   FOREIGN KEY(AnswerableGroupID) REFERENCES AnswerableQuestionsGroups(AnswerableGroupID) ON UPDATE CASCADE ON DELETE CASCADE
-) ENGINE=innodb;
+);
 
 
 /***************************************************************************/
@@ -329,7 +387,7 @@ CREATE TABLE AnsweringQuestionsGroup(
 /* Falls Under the Answerable Questions Group. Which holds all the info for*/
 /* a question that has the ability to be answered.                         */
 /***************************************************************************/
-DROP TABLE AnswerableQuestions;
+
 CREATE TABLE AnswerableQuestions(
   AnswerableID BIGINT AUTO_INCREMENT,
   AnswerableGroupID BIGINT,
@@ -340,14 +398,14 @@ CREATE TABLE AnswerableQuestions(
   PRIMARY KEY(AnswerableID,AnswerableGroupID),
   FOREIGN KEY(QuestionID) REFERENCES Questions(QuestionID) ON UPDATE CASCADE ON DELETE CASCADE,
   FOREIGN KEY(AnswerableGroupID) REFERENCES AnswerableQuestionsGroups(AnswerableGroupID) ON UPDATE CASCADE ON DELETE CASCADE
-) ENGINE=innodb;
+);
 
 /***************************************************************************/
 /* Answered Questions                                                      */
 /* Fold Under the Answerable Question. Which holds a particular response to*/
 /* a answerable question                                                   */
 /***************************************************************************/
-DROP TABLE AnsweredQuestions;
+
 CREATE TABLE AnsweredQuestions(
   AnswerableID BIGINT AUTO_INCREMENT ,
   AnsweredHTML TEXT,               /* Once the question is answered. The HTML that is showing will be saved */
@@ -357,9 +415,9 @@ CREATE TABLE AnsweredQuestions(
   PRIMARY KEY(AnswerableID,AnsweringGroupID),
   FOREIGN KEY(AnswerableID) REFERENCES AnswerableQuestions(AnswerableID) ON UPDATE CASCADE ON DELETE CASCADE
 
-) ENGINE=innodb;
+);
 
-DROP TRIGGER AnswerableQuestionsNumberTracker;
+
 DELIMITER //
 CREATE TRIGGER AnswerableQuestionsNumberTracker
 BEFORE INSERT ON AnswerableQuestions
@@ -373,7 +431,7 @@ FOR EACH ROW
 
   END//
 DELIMITER ;
-DROP TRIGGER AnsweredQuestionsNumberTracker;
+
 DELIMITER //
 CREATE TRIGGER AnsweredQuestionsNumberTracker
 BEFORE INSERT ON AnsweredQuestions
@@ -381,7 +439,7 @@ FOR EACH ROW
   BEGIN
     if new.AnswerableID IS NULL THEN
 
-        SET new.AnswerableID=(SELECT (MAX(S1.AnswerableID)+1) FROM AnsweredQuestions AS S1 WHERE S1.AnsweringGroupID=new.AnsweringGroupID);
+      SET new.AnswerableID=(SELECT (MAX(S1.AnswerableID)+1) FROM AnsweredQuestions AS S1 WHERE S1.AnsweringGroupID=new.AnsweringGroupID);
 
     END IF;
 
@@ -392,19 +450,19 @@ DELIMITER ;
 /* Course Content Breadcrumb Improving. We will have a trigger to keep     */
 /* of children                                                             */
 /***************************************************************************/
-DROP TABLE CourseContentChildren;
+
 CREATE TABLE CourseContentChildren(
   ContentID BIGINT,
   ChildContentID BIGINT,
   Depth INTEGER
-) ENGINE=innodb;
+);
 
 
 
 /***************************************************************************/
 /* Question Types. We don't want to delete this all the time. Very important*/
 /***************************************************************************/
-# DROP TABLE QuestionTypes
+#
 # CREATE TABLE QuestionTypes
 # (
 #   QuestionTypeID BIGINT NOT NULL AUTO_INCREMENT,
@@ -419,7 +477,7 @@ CREATE TABLE CourseContentChildren(
 /***************************************************************************/
 /* Questions. We don't want to delete this all the time. Very important    */
 /***************************************************************************/
-# DROP TABLE Questions;
+#
 # CREATE TABLE Questions
 # (
 #   QuestionID BIGINT NOT NULL AUTO_INCREMENT,
@@ -438,7 +496,7 @@ CREATE TABLE CourseContentChildren(
 /***************************************************************************/
 /* Assessments                                                             */
 /***************************************************************************/
-DROP TABLE Assessments;
+
 # CREATE TABLE Assessments(
 #
 #   AssessmentID BIGINT NOT NULL AUTO_INCREMENT,
@@ -458,12 +516,12 @@ DROP TABLE Assessments;
 #   FOREIGN KEY(AnswerableGroupID) REFERENCES AnswerableQuestionsGroups(AnswerableGroupID)ON UPDATE CASCADE ON DELETE CASCADE,
 #   FOREIGN KEY(CreatedBy) REFERENCES Users(UserID) ON UPDATE CASCADE ON DELETE CASCADE
 #
-# ) ENGINE=innodb;
+# );
 
 /***************************************************************************/
 /* Assessment Questions                                                    */
 /***************************************************************************/
-DROP TABLE AssessmentQuestions;
+
 # CREATE TABLE AssessmentQuestions(
 #   AssessmentQuestionID BIGINT NOT NULL AUTO_INCREMENT ,
 #   AssessmentID BIGINT NOT NULL ,
@@ -475,12 +533,12 @@ DROP TABLE AssessmentQuestions;
 #   FOREIGN KEY(AssessmentID) REFERENCES Assessments(AssessmentID) ON UPDATE CASCADE ON DELETE CASCADE,
 #   FOREIGN KEY(QuestionID) REFERENCES Questions(QuestionID) ON UPDATE CASCADE ON DELETE CASCADE,
 #   FOREIGN KEY(AddedBy) REFERENCES Users(AddedBy) ON UPDATE CASCADE ON DELETE CASCADE
-# ) ENGINE=innodb;
+# );
 
 /***************************************************************************/
 /* Running Assessments. The User Instance of an Assessment                 */
 /***************************************************************************/
-DROP TABLE RunningAssessments;
+
 # CREATE TABLE RunningAssessments(
 #   AnsweredID BIGINT NOT NULL AUTO_INCREMENT,
 #   AssessmentID BIGINT NOT NULL,
@@ -499,7 +557,7 @@ DROP TABLE RunningAssessments;
 #   FOREIGN KEY(GradedBy) REFERENCES Users(GradedBy) ON UPDATE CASCADE ON DELETE CASCADE,
 #   FOREIGN KEY(AnsweringGroupID) REFERENCES AnsweringQuestionsGroup(AnsweringGroupID) ON UPDATE CASCADE ON DELETE CASCADE
 #
-# ) ENGINE=innodb;
+# );
 
 
 
@@ -507,7 +565,7 @@ DROP TABLE RunningAssessments;
 
 
 /*
-DROP TABLE AnswerableQuestionsGroupTypes;
+
 CREATE TABLE AnswerableQuestionsGroupTypes(
   GroupID BIGINT NOT NULL AUTO_INCREMENT ,
   Name VARCHAR(300) NOT NULL,
@@ -539,24 +597,24 @@ DELIMITER //
 /* A way to keep track of who is the child and who is the parent. To make  */
 /* sql selects easier and faster                                           */
 /***************************************************************************/
-DROP TRIGGER CourseContentNumberTracker;
+
 DELIMITER //
 CREATE TRIGGER CourseContentNumberTracker
-  BEFORE INSERT ON CourseContent
-  FOR EACH ROW
-    BEGIN
-      if new.CourseContentNumber IS NULL THEN
+BEFORE INSERT ON CourseContent
+FOR EACH ROW
+  BEGIN
+    if new.CourseContentNumber IS NULL THEN
+      SET new.RootContentID=0;
+      SET new.CourseContentNumber=0;
+      if new.ParentFolderID is NOT NULL THEN
+        SET new.CourseContentNumber=(SELECT (MAX(S1.CourseContentNumber)+1) FROM CourseContent AS S1 WHERE S1.RootContentID=new.RootContentID);
+      ELSE
         SET new.RootContentID=0;
-        SET new.CourseContentNumber=0;
-        if new.ParentFolderID is NOT NULL THEN
-          SET new.CourseContentNumber=(SELECT (MAX(S1.CourseContentNumber)+1) FROM CourseContent AS S1 WHERE S1.RootContentID=new.RootContentID);
-        ELSE
-          SET new.RootContentID=0;
-        END IF;
-
       END IF;
 
-    END//
+    END IF;
+
+  END//
 DELIMITER ;
 
 # CREATE TRIGGER CourseContentChildren
@@ -593,7 +651,27 @@ DELIMITER ;
 #   END//
 #
 #
-
+CREATE VIEW `UsersAnswersTemp` AS
+  SELECT
+    `S8`.`AnswerableID` AS `AnswerableID`,
+    `S9`.`AnsweredHTML` AS `AnsweredHTML`,
+    `S3`.`StartedBy`    AS `AnsweredBy`,
+    `S9`.`Attempts`     AS `Attempts`,
+    `S9`.`ChosenAnswer` AS `ChosenAnswer`,
+    `S10`.`UserID`      AS `UserID`,
+    `S10`.`FirstName`   AS `FirstName`,
+    `S10`.`LastName`    AS `LastName`,
+    `S10`.`Email`       AS `Email`,
+    `S10`.`PhoneNumber` AS `PhoneNumber`,
+    `S10`.`UserName`    AS `UserName`,
+    `S10`.`Password`    AS `Password`,
+    `S10`.`Role`        AS `Role`,
+    `S10`.`UHID`        AS `UHID`
+  FROM (((`AnswerableQuestions` `S8` LEFT JOIN `AnsweredQuestions` `S9`
+      ON ((`S9`.`AnswerableID` = `S8`.`AnswerableID`))) JOIN `AnsweringQuestionsGroup` `S3`
+      ON (((`S3`.`AnswerableGroupID` = `S8`.`AnswerableGroupID`) AND
+           (`S3`.`AnsweringGroupID` = `S9`.`AnsweringGroupID`)))) LEFT JOIN `Users` `S10`
+      ON ((`S3`.`StartedBy` = `S10`.`UserID`)));
 /***************************************************************************/
 /***************************************************************************/
 /***************************************************************************/
@@ -625,8 +703,8 @@ CREATE VIEW `AnsweredQuestionsCombo` AS
     (CASE WHEN (`S5`.`ChosenAnswer` = `S1`.`CorrectAnswer`)
       THEN 1
      ELSE 0 END)                                           AS `IsCorrect`
-  FROM ((`hecflore_CELO`.`AnswerableQuestions` `S1` LEFT JOIN `hecflore_CELO`.`AnsweredQuestions` `S5`
-      ON ((`S5`.`AnswerableID` = `S1`.`AnswerableID`))) LEFT JOIN `hecflore_CELO`.`AnsweringQuestionsGroup` `S6`
+  FROM ((`AnswerableQuestions` `S1` LEFT JOIN `AnsweredQuestions` `S5`
+      ON ((`S5`.`AnswerableID` = `S1`.`AnswerableID`))) LEFT JOIN `AnsweringQuestionsGroup` `S6`
       ON ((`S6`.`AnsweringGroupID` = `S5`.`AnsweringGroupID`)));
 CREATE VIEW `AnsweredQuestionsReport` AS
   SELECT
@@ -675,11 +753,11 @@ CREATE VIEW `AnsweredQuestionsReport` AS
     (CASE WHEN ((`S5`.`ChosenAnswer` IS NOT NULL) AND (`S5`.`ChosenAnswer` = `S1`.`CorrectAnswer`))
       THEN `S1`.`PointsWorth`
      ELSE 0 END)                                           AS `PointsEarned`
-  FROM (((`hecflore_CELO`.`AnswerableQuestions` `S1` LEFT JOIN `hecflore_CELO`.`Questions` `S3`
-      ON ((`S3`.`QuestionID` = `S1`.`QuestionID`))) LEFT JOIN `hecflore_CELO`.`AnswerableQuestionsGroups` `S4`
-      ON ((`S4`.`AnswerableGroupID` = `S1`.`AnswerableGroupID`))) JOIN ((`hecflore_CELO`.`Users` `S2`
-    JOIN `hecflore_CELO`.`AnsweringQuestionsGroup` `S5_2` ON ((`S2`.`UserID` = `S5_2`.`StartedBy`))) JOIN
-    `hecflore_CELO`.`AnsweredQuestions` `S5` ON ((`S5`.`AnsweringGroupID` = `S5_2`.`AnsweringGroupID`))))
+  FROM (((`AnswerableQuestions` `S1` LEFT JOIN `Questions` `S3`
+      ON ((`S3`.`QuestionID` = `S1`.`QuestionID`))) LEFT JOIN `AnswerableQuestionsGroups` `S4`
+      ON ((`S4`.`AnswerableGroupID` = `S1`.`AnswerableGroupID`))) JOIN ((`Users` `S2`
+    JOIN `AnsweringQuestionsGroup` `S5_2` ON ((`S2`.`UserID` = `S5_2`.`StartedBy`))) JOIN
+    `AnsweredQuestions` `S5` ON ((`S5`.`AnsweringGroupID` = `S5_2`.`AnsweringGroupID`))))
   WHERE (`S1`.`AnswerableID` = `S5`.`AnswerableID`)
   UNION ALL SELECT
               `S1`.`AnswerableID`                AS `AnswerableID`,
@@ -715,19 +793,19 @@ CREATE VIEW `AnsweredQuestionsReport` AS
               `S2`.`Role`                        AS `Role`,
               `S2`.`UHID`                        AS `UHID`,
               0                                  AS `PointsEarned`
-            FROM ((`hecflore_CELO`.`Users` `S2`
-              JOIN `hecflore_CELO`.`UsersAnswersTemp` `S5`) JOIN ((
-                (`hecflore_CELO`.`AnswerableQuestions` `S1` LEFT JOIN `hecflore_CELO`.`Questions` `S3`
+            FROM ((`Users` `S2`
+              JOIN `UsersAnswersTemp` `S5`) JOIN ((
+                (`AnswerableQuestions` `S1` LEFT JOIN `Questions` `S3`
                     ON ((`S3`.`QuestionID` = `S1`.`QuestionID`))) LEFT JOIN
-                `hecflore_CELO`.`AnswerableQuestionsGroups` `S4`
+                `AnswerableQuestionsGroups` `S4`
                   ON ((`S4`.`AnswerableGroupID` = `S1`.`AnswerableGroupID`))) JOIN
-              `hecflore_CELO`.`AnsweringQuestionsGroup` `S13`
+              `AnsweringQuestionsGroup` `S13`
                 ON ((`S13`.`AnswerableGroupID` = `S4`.`AnswerableGroupID`))))
             WHERE ((`S1`.`AnswerableID` = `S5`.`AnsweredBy`) AND (NOT (`S2`.`UserID` IN (SELECT DISTINCT `S13`.`StartOn`
                                                                                          FROM (
-                                                                                             `hecflore_CELO`.`AnsweredQuestions` `S12`
+                                                                                             `AnsweredQuestions` `S12`
                                                                                              JOIN
-                                                                                             `hecflore_CELO`.`AnsweringQuestionsGroup` `S13`
+                                                                                             `AnsweringQuestionsGroup` `S13`
                                                                                                ON ((
                                                                                                `S13`.`AnsweringGroupID`
                                                                                                =
@@ -752,8 +830,8 @@ CREATE VIEW `CourseContentBreadcrumbs` AS
     `S1`.`Gradable`       AS `Gradable`,
     `S1`.`CreatedBy`      AS `CreatedBy`,
     `S1`.`RolesVisible`   AS `RolesVisible`
-  FROM (`hecflore_CELO`.`CourseContentChildren` `S2`
-    JOIN `hecflore_CELO`.`CourseContent` `S1` ON ((`S1`.`ContentID` = `S2`.`ContentID`)));
+  FROM (`CourseContentChildren` `S2`
+    JOIN `CourseContent` `S1` ON ((`S1`.`ContentID` = `S2`.`ContentID`)));
 CREATE VIEW `CourseContentBreadcrumbsForward` AS
   SELECT
     `S2`.`ContentID`      AS `ContentID`,
@@ -772,8 +850,8 @@ CREATE VIEW `CourseContentBreadcrumbsForward` AS
     `S1`.`Gradable`       AS `Gradable`,
     `S1`.`CreatedBy`      AS `CreatedBy`,
     `S1`.`RolesVisible`   AS `RolesVisible`
-  FROM (`hecflore_CELO`.`CourseContentChildren` `S2`
-    JOIN `hecflore_CELO`.`CourseContent` `S1` ON ((`S1`.`ContentID` = `S2`.`ChildContentID`)));
+  FROM (`CourseContentChildren` `S2`
+    JOIN `CourseContent` `S1` ON ((`S1`.`ContentID` = `S2`.`ChildContentID`)));
 CREATE VIEW `CourseContentReport` AS
   SELECT
     `S3`.`CourseUniqueID`      AS `CourseUniqueID`,
@@ -812,9 +890,9 @@ CREATE VIEW `CourseContentReport` AS
     `S3`.`Description`         AS `Course_Description`,
     `S3`.`CourseStatus`        AS `Course_CourseStatus`,
     `S3`.`CreatedBy`           AS `Course_CreatedBy`
-  FROM (((`hecflore_CELO`.`CourseContent` `S1` LEFT JOIN `hecflore_CELO`.`Sections` `S2`
-      ON ((`S1`.`SectionID` = `S2`.`SectionID`))) LEFT JOIN `hecflore_CELO`.`Users` `S4`
-      ON ((`S4`.`UserID` = `S2`.`CreatedBy`))) LEFT JOIN `hecflore_CELO`.`Courses` `S3`
+  FROM (((`CourseContent` `S1` LEFT JOIN `Sections` `S2`
+      ON ((`S1`.`SectionID` = `S2`.`SectionID`))) LEFT JOIN `Users` `S4`
+      ON ((`S4`.`UserID` = `S2`.`CreatedBy`))) LEFT JOIN `Courses` `S3`
       ON ((`S3`.`CourseUniqueID` = `S2`.`CourseUniqueID`)));
 CREATE VIEW `CourseSectionsReport` AS
   SELECT
@@ -846,9 +924,9 @@ CREATE VIEW `CourseSectionsReport` AS
     `S4`.`Role`                 AS `Role`,
     `S3`.`UHID`                 AS `UHID`,
     (`S4`.`UserID` IS NOT NULL) AS `isActive`
-  FROM (((`hecflore_CELO`.`Courses` `S1` LEFT JOIN `hecflore_CELO`.`Sections` `S2`
-      ON ((`S1`.`CourseUniqueID` = `S2`.`CourseUniqueID`))) LEFT JOIN `hecflore_CELO`.`SectionUsers` `S3`
-      ON ((`S2`.`SectionID` = `S3`.`SectionID`))) LEFT JOIN `hecflore_CELO`.`Users` `S4`
+  FROM (((`Courses` `S1` LEFT JOIN `Sections` `S2`
+      ON ((`S1`.`CourseUniqueID` = `S2`.`CourseUniqueID`))) LEFT JOIN `SectionUsers` `S3`
+      ON ((`S2`.`SectionID` = `S3`.`SectionID`))) LEFT JOIN `Users` `S4`
       ON (((isnull(`S3`.`UserID`) AND (`S3`.`UHID` = `S4`.`UHID`)) OR
            ((`S3`.`UserID` IS NOT NULL) AND (`S3`.`UserID` = `S4`.`UserID`)))));
 CREATE VIEW `GradeProgress_CourseContentTree` AS
@@ -862,10 +940,10 @@ CREATE VIEW `GradeProgress_CourseContentTree` AS
     (CASE WHEN isnull(`S3`.`PointsEarned`)
       THEN 0
      ELSE ((sum(`S3`.`PointsEarned`) / sum(`S3`.`PointsWorth`)) * 100.0) END) AS `Grade`
-  FROM (((`hecflore_CELO`.`CourseContentBreadcrumbs` `S1` LEFT JOIN `hecflore_CELO`.`CourseContent` `S4`
-      ON ((`S4`.`ContentID` = `S1`.`ChildContentID`))) LEFT JOIN `hecflore_CELO`.`AnswerableQuestionsGroups` `S2`
-      ON ((`S2`.`CourseContentID` = `S1`.`ChildContentID`))) LEFT JOIN `hecflore_CELO`.`AnsweredQuestionsReport` `S3`
-      ON ((`S3`.`AnswerableGroupID` = `S2`.`AnswerableGroupID`))) JOIN `hecflore_CELO`.`Users` `S7`
+  FROM (((`CourseContentBreadcrumbs` `S1` LEFT JOIN `CourseContent` `S4`
+      ON ((`S4`.`ContentID` = `S1`.`ChildContentID`))) LEFT JOIN `AnswerableQuestionsGroups` `S2`
+      ON ((`S2`.`CourseContentID` = `S1`.`ChildContentID`))) LEFT JOIN `AnsweredQuestionsReport` `S3`
+      ON ((`S3`.`AnswerableGroupID` = `S2`.`AnswerableGroupID`))) JOIN `Users` `S7`
   WHERE (`S7`.`UserID` = `S3`.`UserID`)
   GROUP BY `S1`.`ContentID`, `S1`.`ChildContentID`, `S1`.`Name`, `S1`.`Type`, `S1`.`Depth`, `S7`.`UserID`;
 CREATE VIEW `QuestionsReport` AS
@@ -881,89 +959,7 @@ CREATE VIEW `QuestionsReport` AS
     `S3`.`LastName`        AS `LastName`,
     `S3`.`Email`           AS `Email`,
     `S3`.`PhoneNumber`     AS `PhoneNumber`
-  FROM (`hecflore_CELO`.`Questions` `S1` LEFT JOIN `hecflore_CELO`.`Users` `S3` ON ((`S3`.`UserID` = `S1`.`CreatedBy`)));
-CREATE VIEW `QuestionTypesReport` AS
-  SELECT
-    `S1`.`QuestionTypeID` AS `QuestionTypeID`,
-    `S1`.`SrcDirectory`   AS `SrcDirectory`,
-    `S1`.`Name`           AS `Name`,
-    `S1`.`CreatedBy`      AS `CreatedBy`,
-    `S3`.`UserID`         AS `UserID`,
-    `S3`.`FirstName`      AS `FirstName`,
-    `S3`.`LastName`       AS `LastName`,
-    `S3`.`Email`          AS `Email`,
-    `S3`.`PhoneNumber`    AS `PhoneNumber`,
-    `S3`.`UserName`       AS `UserName`,
-    `S3`.`Password`       AS `Password`,
-    `S3`.`Role`           AS `Role`,
-    `S3`.`UHID`           AS `UHID`
-  FROM (`hecflore_CELO`.`QuestionTypes` `S1` LEFT JOIN `hecflore_CELO`.`Users` `S3`
-      ON ((`S3`.`UserID` = `S1`.`CreatedBy`)));
-CREATE VIEW `RunningAssessmentsReport` AS
-  SELECT
-    `S1`.`AnsweredID`                                                                                              AS `AnsweredID`,
-    `S1`.`AssessmentID`                                                                                            AS `AssessmentID`,
-    `S1`.`StartTime`                                                                                               AS `StartTime`,
-    `S1`.`EndTime`                                                                                                 AS `EndTime`,
-    `S1`.`TotalPoints`                                                                                             AS `TotalPoints`,
-    sum(
-        `S4`.`PointsEarned`)                                                                                       AS `EarnedPoints`,
-    count(
-        `S6`.`AnswerableID`)                                                                                       AS `Answered`,
-    count(
-        `S4`.`AnswerableID`)                                                                                       AS `TotalQuestions`,
-    ((sum(`S4`.`PointsEarned`) / `S1`.`TotalPoints`) *
-     100.0)                                                                                                        AS `Grade`,
-    (((sum(`S4`.`PointsEarned`) / `S1`.`TotalPoints`) / (sum((CASE WHEN (`S4`.`Attempts` = 0)
-      THEN 1
-                                                              ELSE 0 END)) / count(`S4`.`AnswerableID`))) *
-     100.0)                                                                                                        AS `RelativeGrade`,
-    ((sum((CASE WHEN (`S4`.`Attempts` = 0)
-      THEN 1
-           ELSE 0 END)) / count(`S6`.`AnswerableID`)) *
-     100.0)                                                                                                        AS `Finished`,
-    `S1`.`AnsweringBy`                                                                                             AS `AnsweringBy`,
-    `S1`.`GradedBy`                                                                                                AS `GradedBy`,
-    `S1`.`AnsweringGroupID`                                                                                        AS `AnsweringGroupID`,
-    `S2`.`Name`                                                                                                    AS `Name`,
-    `S2`.`URL`                                                                                                     AS `URL`,
-    `S2`.`Description`                                                                                             AS `Description`,
-    `S2`.`Type`                                                                                                    AS `Type`,
-    `S2`.`Properties`                                                                                              AS `Properties`,
-    `S2`.`AssociatedCourseContentID`                                                                               AS `AssociatedCourseContentID`,
-    `S2`.`Timelimit`                                                                                               AS `Timelimit`
-  FROM (((((`hecflore_CELO`.`RunningAssessments` `S1`
-    JOIN `hecflore_CELO`.`Assessments` `S2` ON ((`S2`.`AssessmentID` = `S1`.`AssessmentID`))) JOIN
-    `hecflore_CELO`.`AnsweringQuestionsGroup` `S3` ON ((`S3`.`AnsweringGroupID` = `S1`.`AnsweringGroupID`))) LEFT JOIN
-    `hecflore_CELO`.`AnsweredQuestionsReport` `S4` ON (((`S4`.`AnswerableGroupID` = `S3`.`AnswerableGroupID`) AND
-                                                        (`S1`.`AnsweringBy` = `S4`.`AnsweredBy`)))) LEFT JOIN
-    `hecflore_CELO`.`AnswerableQuestions` `S5` ON (((`S5`.`AnswerableGroupID` = `S3`.`AnswerableGroupID`) AND
-                                                    (`S4`.`AnswerableID` = `S5`.`AnswerableID`)))) LEFT JOIN
-    `hecflore_CELO`.`AnsweredQuestions` `S6` ON ((`S6`.`AnsweringGroupID` = `S1`.`AnsweringGroupID`)))
-  GROUP BY `S1`.`AnsweredID`, `S1`.`AssessmentID`, `S1`.`StartTime`, `S1`.`EndTime`, `S1`.`TotalPoints`,
-    `S1`.`EarnedPoints`, `S1`.`AnsweringBy`, `S1`.`GradedBy`, `S1`.`AnsweringGroupID`, `S2`.`Name`, `S2`.`URL`,
-    `S2`.`Description`, `S2`.`Type`, `S2`.`Properties`, `S2`.`AssociatedCourseContentID`, `S2`.`Timelimit`;
-CREATE VIEW `UsersAnswersTemp` AS
-  SELECT
-    `S8`.`AnswerableID` AS `AnswerableID`,
-    `S9`.`AnsweredHTML` AS `AnsweredHTML`,
-    `S3`.`StartedBy`    AS `AnsweredBy`,
-    `S9`.`Attempts`     AS `Attempts`,
-    `S9`.`ChosenAnswer` AS `ChosenAnswer`,
-    `S10`.`UserID`      AS `UserID`,
-    `S10`.`FirstName`   AS `FirstName`,
-    `S10`.`LastName`    AS `LastName`,
-    `S10`.`Email`       AS `Email`,
-    `S10`.`PhoneNumber` AS `PhoneNumber`,
-    `S10`.`UserName`    AS `UserName`,
-    `S10`.`Password`    AS `Password`,
-    `S10`.`Role`        AS `Role`,
-    `S10`.`UHID`        AS `UHID`
-  FROM (((`hecflore_CELO`.`AnswerableQuestions` `S8` LEFT JOIN `hecflore_CELO`.`AnsweredQuestions` `S9`
-      ON ((`S9`.`AnswerableID` = `S8`.`AnswerableID`))) JOIN `hecflore_CELO`.`AnsweringQuestionsGroup` `S3`
-      ON (((`S3`.`AnswerableGroupID` = `S8`.`AnswerableGroupID`) AND
-           (`S3`.`AnsweringGroupID` = `S9`.`AnsweringGroupID`)))) LEFT JOIN `hecflore_CELO`.`Users` `S10`
-      ON ((`S3`.`StartedBy` = `S10`.`UserID`)));
+  FROM (`Questions` `S1` LEFT JOIN `Users` `S3` ON ((`S3`.`UserID` = `S1`.`CreatedBy`)));
 
 
 
