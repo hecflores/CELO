@@ -1,3 +1,6 @@
+<?php
+$__VERSION__ = "___VERSION_STRING___"
+?>
 <!DOCTYPE html>
 <html lang = "en">
 
@@ -27,6 +30,10 @@
 <body>
 <div id = "app"></div>
 <div id = "popups"></div>
+<div style="display:inline-block;position:fixed;top:100%;left:100%;transform:translate(-100%,-100%);padding:10px;color:black;font-weight:bold"><?php echo $__VERSION__; ?></div>
+<script>
+var $__VERSION__ = "<?php echo $__VERSION__; ?>"
+</script>
 <script src = "/resources/index.js"></script>
 </body>
 
