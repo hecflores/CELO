@@ -69,7 +69,7 @@ $dir = (Split-Path $MyInvocation.MyCommand.Path)
 
 try {
     $phar = (Install-Composer $tmp $dir)
-    &$phpPath $phar install -ignore-platform-reqs
+    &$phpPath $phar install --ignore-platform-reqs
 } catch {
     Write-Host -ForegroundColor Red "[ERROR]"
     Write-Host $Error[0].Exception.Message
