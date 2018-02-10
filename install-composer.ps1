@@ -69,7 +69,7 @@ $dir = (Split-Path $MyInvocation.MyCommand.Path)
 
 try {
     $phar = (Install-Composer $tmp $dir)
-    &$phpPath $phar $args
+    &$phpPath $phar install
 } catch {
     Write-Host -ForegroundColor Red "[ERROR]"
     Write-Host $Error[0].Exception.Message
