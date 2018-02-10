@@ -1,4 +1,4 @@
-Params(
+Param(
    [string]$phpPath
 
 )
@@ -33,9 +33,6 @@ function Install-Composer {
         [int] $retry = 3
     )
 
-    if (!(Get-Command -Name PHP 2>&1)) {
-        throw "Please install PHP into your computer (Cannot find 'PHP' from PATH)"
-    }
 
     $phar = $dir + "\composer.phar"
     if (Test-Path $phar) {
