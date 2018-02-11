@@ -15,7 +15,7 @@ class HomePage extends React.Component
     render(){
         return <div className="welcome-home-page-pretty-dom">
                     {React.cloneElement(CourseContentIconImages.MainLogo2,{style:{...CourseContentIconImages.MainLogo2.props.style,width:'100%'}})}
-                    <h2>Welcome,</h2>
+                    <h2>Hello,</h2>
                     <p>Here at CELO our goal is to ensure that when students need to do homework they have a comfortable environment to do it.
                         With the help of fun ways of answering questions as does magic points. <InlineIcon>{CourseContentIconImages.MagicPoints}</InlineIcon>
                     </p>
