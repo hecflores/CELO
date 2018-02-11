@@ -4,7 +4,7 @@ var config = {
     entry: './src/app.js',
 
     output: {
-        path:'../../../../../public/resources',
+        path:'output',
         filename: 'index.js',
     },
 
