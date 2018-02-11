@@ -4,7 +4,7 @@ USE __DATABASE__;
 /*dsdsd*/
 
 
-DROP PROCEDURE  RemoveAllTables;
+DROP PROCEDURE IF EXISTS RemoveAllTables;
 DELIMITER //
 CREATE PROCEDURE RemoveAllTables(IN Init BOOL)
 
@@ -38,7 +38,7 @@ CREATE PROCEDURE RemoveAllTables(IN Init BOOL)
 //
 DELIMITER ;
 
-DROP PROCEDURE  RemoveAllViews;
+DROP PROCEDURE IF EXISTS  RemoveAllViews;
 
 DELIMITER //
 CREATE PROCEDURE RemoveAllViews(IN Init BOOL)
@@ -70,7 +70,7 @@ CREATE PROCEDURE RemoveAllViews(IN Init BOOL)
 //
 DELIMITER ;
 
-DROP PROCEDURE  RemoveAllForeignKeys;
+DROP PROCEDURE IF EXISTS  RemoveAllForeignKeys;
 
 DELIMITER //
 CREATE PROCEDURE RemoveAllForeignKeys(IN Init BOOL)
