@@ -1,6 +1,0 @@
-import ValidationInput from '../Tools/ValidationInput.jsx';
-
-const NumberInput=(props)=>
-{
-    return <ValidationInput isRequired={true} Match={/^\d+$/} MessageOnError={"Only Numbers Excepted"} MessageOnSuccess={"Perfect!"} onValidDataChange={}/>
-};

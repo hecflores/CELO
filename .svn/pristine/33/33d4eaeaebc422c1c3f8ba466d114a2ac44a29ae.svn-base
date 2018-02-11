@@ -1,6 +1,0 @@
-import React from 'react';
-
-class SectionCreatorPopup extends React.Component
-{
-
-}
