@@ -1,0 +1,30 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Hector
+ * Date: 3/4/2017
+ * Time: 12:15 AM
+ */
+
+?>
+<script>
+    MessageBox.ShowPopup(
+        {
+            title: "<h2 class='text-danger'><span class='glyphicon glyphicon-remove'></span> Forbidden</h2>",
+            content: "<strong class='text-danger'>We are very sorry but it seems that you dont have access to this page<br>",
+            closeCallback:function(){
+                document.location='/';
+            },
+            options:
+                {
+                    "home":
+                        {
+                            type: "success",
+                            content: "Go Home",
+                            callback:function(){
+                                document.location='/';
+                            }
+                        },
+                }
+        });
+</script>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="AdministratorTest\Controller\UserControllerTest" file="D:\wamp\www\CELO\module\Administrator\test\AdministratorTest\Controller\UserControllerTest.php" tests="12" assertions="11" failures="3" errors="0" time="2.892551">
+    <testcase name="testLoginPageAdministrator" class="AdministratorTest\Controller\UserControllerTest" file="D:\wamp\www\CELO\module\Administrator\test\AdministratorTest\Controller\UserControllerTest.php" line="31" assertions="5" time="0.473874"/>
+    <testcase name="testLoginActionAdministrator" class="AdministratorTest\Controller\UserControllerTest" file="D:\wamp\www\CELO\module\Administrator\test\AdministratorTest\Controller\UserControllerTest.php" line="42" assertions="5" time="0.609248"/>
+    <testcase name="testAccessHomePage" class="AdministratorTest\Controller\UserControllerTest" file="D:\wamp\www\CELO\module\Administrator\test\AdministratorTest\Controller\UserControllerTest.php" line="54" assertions="0" time="0.242532">
+      <failure type="PHPUnit_Framework_ExpectationFailedException">AdministratorTest\Controller\UserControllerTest::testAccessHomePage&#13;
+Failed asserting response code "200", actual status code is "302"
+&#13;
+D:\wamp\www\CELO\vendor\zendframework\zend-test\src\PHPUnit\Controller\AbstractControllerTestCase.php:421
+D:\wamp\www\CELO\module\Administrator\test\AdministratorTest\Controller\UserControllerTest.php:57
+</failure>
+    </testcase>
+    <testcase name="testViewCourses" class="AdministratorTest\Controller\UserControllerTest" file="D:\wamp\www\CELO\module\Administrator\test\AdministratorTest\Controller\UserControllerTest.php" line="64" assertions="0" time="0.274089">
+      <failure type="PHPUnit_Framework_ExpectationFailedException">AdministratorTest\Controller\UserControllerTest::testViewCourses&#13;
+Failed asserting response code "200", actual status code is "302"
+&#13;
+D:\wamp\www\CELO\vendor\zendframework\zend-test\src\PHPUnit\Controller\AbstractControllerTestCase.php:421
+D:\wamp\www\CELO\module\Administrator\test\AdministratorTest\Controller\UserControllerTest.php:67
+</failure>
+    </testcase>
+    <testcase name="testViewCourseDetails" class="AdministratorTest\Controller\UserControllerTest" file="D:\wamp\www\CELO\module\Administrator\test\AdministratorTest\Controller\UserControllerTest.php" line="74" assertions="0" time="0.143011"/>
+    <testcase name="testAddSectionToCourse" class="AdministratorTest\Controller\UserControllerTest" file="D:\wamp\www\CELO\module\Administrator\test\AdministratorTest\Controller\UserControllerTest.php" line="78" assertions="0" time="0.157336"/>
+    <testcase name="testDeleteCourse" class="AdministratorTest\Controller\UserControllerTest" file="D:\wamp\www\CELO\module\Administrator\test\AdministratorTest\Controller\UserControllerTest.php" line="82" assertions="0" time="0.173640"/>
+    <testcase name="testDeleteCourseSection" class="AdministratorTest\Controller\UserControllerTest" file="D:\wamp\www\CELO\module\Administrator\test\AdministratorTest\Controller\UserControllerTest.php" line="86" assertions="0" time="0.143080"/>
+    <testcase name="testChangeCourseID" class="AdministratorTest\Controller\UserControllerTest" file="D:\wamp\www\CELO\module\Administrator\test\AdministratorTest\Controller\UserControllerTest.php" line="90" assertions="0" time="0.151323"/>
+    <testcase name="testDeleteSection" class="AdministratorTest\Controller\UserControllerTest" file="D:\wamp\www\CELO\module\Administrator\test\AdministratorTest\Controller\UserControllerTest.php" line="94" assertions="0" time="0.141827"/>
+    <testcase name="testLogout" class="AdministratorTest\Controller\UserControllerTest" file="D:\wamp\www\CELO\module\Administrator\test\AdministratorTest\Controller\UserControllerTest.php" line="98" assertions="0" time="0.141383"/>
+    <testcase name="testLoginPageActionCanBeAccessed" class="AdministratorTest\Controller\UserControllerTest" file="D:\wamp\www\CELO\module\Administrator\test\AdministratorTest\Controller\UserControllerTest.php" line="104" assertions="1" time="0.241208">
+      <failure type="PHPUnit_Framework_ExpectationFailedException">AdministratorTest\Controller\UserControllerTest::testLoginPageActionCanBeAccessed&#13;
+Failed asserting response redirects to "/administrator/login", actual redirection is "/guest/login"
+&#13;
+D:\wamp\www\CELO\vendor\zendframework\zend-test\src\PHPUnit\Controller\AbstractHttpControllerTestCase.php:282
+D:\wamp\www\CELO\module\Administrator\test\AdministratorTest\Controller\UserControllerTest.php:109
+</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

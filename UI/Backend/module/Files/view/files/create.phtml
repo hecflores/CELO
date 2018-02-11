@@ -1,0 +1,201 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Hector
+ * Date: 3/8/2017
+ * Time: 3:11 PM
+ */
+use Application\Info;
+
+/** @var \Files\Service\CourseContentTypes\CourseContentType $CourseContentType */
+/** @var \Application\Model\CourseContent|null $CourseContentItem */
+
+$CourseContentType=$this->CourseContentType;
+$CourseContentItem=$this->CourseContentItem;
+$BaseURL=$this->BaseURL;
+
+
+?>
+
+<?php
+$contentTypes=array(
+    "section"=>array(
+        "title"=>"Section",
+        "allowedParents"=>array(
+            "folder",
+            "course"
+        )
+    ),
+    "topic"=>array(
+        "title"=>"Topic",
+        "allowedParents"=>array(
+            "section"
+        )
+    ),
+    "assessment" => array(
+        "title"=>"Assessment",
+        "allowedParents"=>array(
+            "topic",
+            "section"
+        )
+    ),
+    "file"=>array(
+        "title"=>"File",
+        "allowedParents"=>array(
+            "folder",
+            "section",
+            "topic",
+            "course"
+        )
+    ),
+    "folder"=>array(
+        "title"=>"Folder",
+        "allowedParents"=>array(
+            "folder",
+            "course"
+        )
+    ),
+    "magic-points"=>array(
+        "title"=>"Magic Points",
+        "allowedParents"=>array(
+            "section"
+        )
+    ),
+    "course"=>array(
+        "title"=>"Course",
+        "allowedParents"=>array(
+        )
+    ),
+    "week"=>array(
+        "title"=>"Course",
+        "allowedParents"=>array(
+            'course'
+        )
+    )
+);
+
+/***************************************************************************/
+/* Removing Items that we dont want to be adding... todo We need to have a cleaner way of doing this
+/***************************************************************************/
+foreach($contentTypes as $contentType => $item){
+    $inList=false;
+    foreach($item["allowedParents"] as $allowedParent){
+        if($allowedParent==$CourseContentItem->getType()){
+            $inList=true;
+            break;
+        }
+    }
+    if(!$inList){
+        unset($contentTypes[$contentType]);
+    }
+
+}
+
+$userID=Info::getCurrentUser()->getUserID();
+$redirectURL=Info::Url(false,true);
+
+/***************************************************************************/
+/* Setting up Predefined(NEEDED) Parameters                                */
+/***************************************************************************/
+$before="";
+
+/***************************************************************************/
+/* Might be replaced with modules(LOw Chance)                              */
+/***************************************************************************/
+$inputForParentID="";
+if($CourseContentItem!=null){
+    $inputForParentID="<input type='hidden' name='Content[ParentFolderID]' value='{$CourseContentItem->getContentID()}'/>";
+    //$before.="<input type='hidden' name='Content[SectionID]' value='{$CourseContentItem->getSectionID()}'/>";
+}
+$before.="<input type='hidden' name='Redirect' value='{$redirectURL}'/>";
+
+
+/***************************************************************************/
+/* Most Likely will be replaced                                            */
+/***************************************************************************/
+$before.="<input type='hidden' name='Content[URL]' value='/course-content/__ID__/view'/>";
+$before.="   <div class='form-group'>"
+        ."      <label for='name'>Name</label>"
+        ."      <input type='text' class='form-control' value='Testing Course Content Creation(Name)' name='Content[Name]' id='name' placeholder='Name of Item'/>"
+        ."   </div>"
+        ."   <div class='form-group'>"
+        ."      <label for='description'>Description</label>"
+        ."      <textarea class='form-control' name='Content[Description]'  id='description' placeholder='Description'>Testing Course Content Creation(Description)</textarea>"
+        ."   </div>";
+
+
+/****************************************************************************/
+/* Output The Popups                                                        */
+/****************************************************************************/
+foreach($contentTypes as $contentType=>$data){
+
+    $name=$data["title"];
+    echo "<div class='modal fade' id='popup_{$contentType}' tabindex='-1' role='dialog' aria-labelledby='label_{$contentType}' aria-hidden='true'>".
+         "   <div class='modal-dialog' role='document'>".
+         "      <div class='modal-content'>".
+         "         <div class='modal-header'>".
+         "            <h3 class='modal-title id='label_{$contentType}'><img src='/img/{$contentType}.png'/> Create {$name}</h3>".
+         "            <button type='buttn' class='close' data-dismiss='modal' aria-label='Close'>".
+         "               <span aria-hidden='true'>&times;</span>".
+         "            </button>".
+         "         </div>".
+         "         <div class='modal-body create-$contentType-container'>".
+         "             <form api-onsubmited='Api.CourseContent.update();' api-form method='POST' action='/api/course-contents' enctype='multipart/form-data'>".($CourseContentItem==null?"":
+         "                <input type='hidden' name='__action__' value='create-new-content'/>".                        //***NEEDED!!***
+         "                <input type='hidden' name='Content[ParentFolderID]' value='{$CourseContentItem->getContentID()}'/>".  //***NEEDED!!***
+         "                <input type='hidden' name='Content[SectionID]' value='{$CourseContentItem->getSectionID()}'/>").      //***NEEDED!!***
+         "                <input type='hidden' name='Content[Type]' value='$contentType'/>".                                    //***NEEDED!!***
+         "                <input type='hidden' name='Content[CreatedBy]' value='{$userID}'/>".                                  //***NEEDED!!***
+         "                <input type='hidden' name='Content[Properties]' value='{}'/>".                                        //***NEEDED!!***
+
+
+         /************************* M o d u l e    C o d e **************************/
+         "                ".$this->partial("files/types/$contentType/create.phtml",array("AutomatedFields"=>$before,"CourseContentItem"=>$CourseContentItem,"BaseURL"=>$BaseURL)).
+        /******************* M o d u l e    C o d e ( E N D ) ***********************/
+
+        "                <input type='hidden' name='Redirect' value='{$redirectURL}'/>".                                       //***NEEDED!!***
+
+         "                <input type='submit' style='display:none' class='form-control btn btn-default submit-btn' value='Create'/>".
+         "             </form>".
+         "         </div>".
+         "         <div class='modal-footer'>".
+         "             <button type='button' class='btn btn-secondary close-btn' data-dismiss='modal'>Close</button>".
+         "             <button type='button' class='btn btn-primary save-changes-btn close-btn' data-dismiss='modal' contentType='popup_{$contentType}' >Save changes</button>".
+         "         </div>".
+         "      </div>".
+         "   </div>".
+         "</div>";
+
+}
+
+/****************************************************************************/
+/* Output The Dropdown Menus                                                */
+/****************************************************************************/
+
+if(count($contentTypes)>0) {
+    echo "<div class='col-lg-12 course-content-header'>" .
+        "   <div class='dropdown'>" .
+        "      <button class='btn btn-primary dropdown-toggle' type='button' id='CreateItemDropDown' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>" .
+        "         Create" .
+        "      </button>" .
+        "   <div class='dropdown-menu' aria-labelledby='CreateItemDropDown'>" .
+        implode("", array_map(function ($id, $item) {
+            return "<li style='font-style:20px'><a data-toggle='modal' data-target='#popup_{$id}' class='dropdown-item' href='#'><span >{$item["title"]}</span><img src='/img/$id.png'/></a></li>";
+        }, array_keys($contentTypes), $contentTypes)) .
+        "   </div>" .
+        "</div>";
+}
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+$(".save-changes-btn").click(function(){
+   $("#"+$(this).attr('contentType')).find("form").submit(); 
+});
+JS;
+$this->inlineScript()->captureEnd();
+
+
+
+
+
+?>

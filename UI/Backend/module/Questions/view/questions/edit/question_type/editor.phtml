@@ -1,0 +1,326 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Hector
+ * Date: 2/27/2017
+ * Time: 5:43 AM
+ */
+use Application\Info;
+
+/** @var string $source */
+?>
+<style>
+    body{
+        background:black;
+
+    }
+    .container{
+        padding:0px;
+        width:100vw;
+    }
+    .navbar{
+        border-bottom:1px solid white;
+    }
+    .saving-indicator {
+        min-width:10px;
+        display:inline-block;
+        left:100%;
+        white-space:nowrap;
+        transform:translate(-120%,-50%);
+        position:absolute;
+        font-size:20px;
+        top:50%;
+
+    }
+    [full-screen] .col-lg-12{
+        padding:0px;
+    }
+    [full-screen] .saving-indicator {
+        min-width:10px;
+        display:inline-block;
+        left:50%;
+        white-space:nowrap;
+        transform:translate(-50%,-50%);
+        position:absolute;
+        font-size:20px;
+        top:50%;
+    }
+    .quickStatus,
+    .question-editor-info,
+    .question-editor,
+    .question-editor-title,
+    .question-editor-full-screen-btn
+    {
+        background:black ;
+    }
+    .token::selection{
+        background:black !important;
+    }
+    .h1{
+        background:black ;
+    }
+    .question-editor *:not(.token):not(a):not(.displayChangedIndicator):not(textarea):not(.CodeFlask__pre ){
+        color:white ;
+    }
+    .question-editor textarea *{
+        background:initial;
+    }
+    .question-editor *:not(.token){
+        border-color:white ;
+    }
+    body .question-editor .spinner{
+        border-color:lawngreen;
+        border-width: thin;
+        display:inline-block;
+        position:relative;
+        left:0px;
+        top:0px;
+    }
+    .question-editor textarea{
+
+        opacity:1;
+        color: white !important;
+
+    }
+    .question-editor .question-editor-container-code{
+        height:50vh;
+    }
+    .question-editor .question-editor-full-screen-btn{
+        float:right;
+    }
+    .question-editor .question-editor-full-screen-btn:before{
+        content:'Switch to Full Screen Mode'
+    }
+    .question-editor .question-editor-full-screen-btn:hover{
+        background:white !important;
+        color:black !important;
+        border-color:black;
+    }
+
+    body[full-screen] .question-editor-info{
+        padding:0px;
+        border:none;
+        margin:0;
+        margin-bottom:10px;
+        margin-top:10px;
+    }
+
+    body[full-screen] .question-editor-full-screen-btn:before{
+        content:'Switch to Normal Mode';
+    }
+    body[full-screen] .question-editor-full-screen-btn{
+        position:absolute;
+        float:none;
+        left:100%;
+        top:2%;
+        transform:translateX(-100%);
+        z-index:2;
+    }
+    body[full-screen] .question-editor .question-editor-container-code{
+        height:85vh;
+    }
+    body[full-screen] .question-editor-title,
+    body[full-screen] .navbar {
+        display:none;
+    }
+    body[full-screen] footer{
+        display:none;
+    }
+    body[full-screen] [data-toggle='tab']{
+        padding:5px;
+        border:none;
+    }
+</style>
+
+<div  class="question-editor col-lg-12">
+    <span onclick="$(this).parents('.question-editor:first').trigger('full-screen-toggle')" class="btn btn-default question-editor-full-screen-btn"></span>
+    <h1 class="question-editor-title">Question Type Editor</h1>
+    <div   class="col-lg-12 question-editor-info well col-lg-12">
+        <b>Last Modified:</b> <span class="lastModified"></span>
+        <div class="saving-indicator"><b  style='font-size:16px' class="quickStatus text-success"></b>
+        <span style='display:none' class="loadingSpinner spinner"></span></div>
+    </div>
+    <div class="col-lg-12 question-editor-container">
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#creatorCodeTab">Question Creator<b style='font-size:20px;padding:10px;padding-top:0px;padding-bottom:0px;;display:none' class="displayChangedIndicator">*</b></a></li>
+            <li><a data-toggle="tab" href="#displayCodeTab">Question Display<b style='font-size:20px;padding:10px;padding-top:0px;padding-bottom:0px;display:none' class="displayChangedIndicator">*</b></span> </a></li>
+
+        </ul>
+
+        <div class="tab-content">
+            <div id="creatorCodeTab" class="tab-pane fade in active">
+                <div class='question-editor-container-code col-lg-12' id="creatorCode" ></div>
+            </div>
+            <div id="displayCodeTab" class="tab-pane fade">
+                <div class='question-editor-container-code col-lg-12' id="displayCode" ></div>
+            </div>
+            <div id="menu2" class="tab-pane fade">
+                <h3>Other</h3>
+                <p>Some content in menu 2.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    var $_ThisURL='<?php  echo "http://uh-celo.local".Info::Url() ?>';
+    var $baseUrl="<?php echo \Application\Info::Url();  ?>";
+    var $_events=new EventHandler();
+
+    function LoadInfo(callback){
+        $.get($baseUrl+"/load",function(data){
+
+            creatorEditor.update(data.creator);
+            displayEditor.update(data.display);
+
+            callback();
+        });
+    }
+    function SaveInfo(callback){
+
+
+
+        $.ajax({
+            url:$baseUrl+"/save",
+            method:"POST",
+            data: JSON.stringify({
+                creator: $("#creatorCode").data("code"),
+                display: $("#displayCode").data("code")
+            }),
+            success:function() {
+                callback();
+            }
+        });
+    }
+
+
+
+
+    $_events.on("textchanged",function(){
+        $(".lastModified").text((new Date()).toTimeString());
+    });
+    $_events.on("display","textchanged",function(){
+
+        $(".displayChangedIndicator").css("display","");
+        $_events.trigger("textchanged");
+    });
+    $_events.on("creator","textchanged",function(){
+        $(".creatorChangedIndicator").css("display","");
+        $_events.trigger("textchanged");
+    });
+    $_events.on("load",function(){
+        $_events.trigger("loading","started");
+        var $this=$(this);
+        LoadInfo(function(){
+            $_events.trigger("loading","ended");
+            setTimeout(function(){
+                $_events.trigger("idle");
+            },2000);
+        });
+    });
+
+    $_events.on("loading","started",function(){
+        $(".quickStatus").text("Loading...");
+        $_events.trigger("spinner","started");
+    });
+
+    $_events.on("loading","ended",function(){
+        $(".quickStatus").text("Loaded!");
+        $_events.trigger("spinner","ended");
+
+    });
+    $_events.on("idle",function() {
+        $(".quickStatus").text("");
+        $_events.trigger("spinner","ended");
+    });
+
+    $_events.on("save",function(){
+        $_events.trigger("saving","started");
+        var $this=$(this);
+        SaveInfo(function(){
+            $_events.trigger("saving","ended");
+            setTimeout(function(){
+                $_events.trigger("idle");
+            },2000);
+        });
+    });
+
+    $_events.on("saving","started",function(){
+        $(".quickStatus").text("Saving...");
+        $_events.trigger("spinner","started");
+    });
+
+    $_events.on("saving","ended",function(){
+        $(".quickStatus").text("Saved!");
+        $_events.trigger("spinner","ended");
+
+        $("#displayChangedIndicator").css("display","none");
+        $("#creatorChangedIndicator").css("display","none");
+        //window.opener.postMessage({url:$_ThisURL,message: 'saved',type:'questionType'}, '<?php  echo "http://uh-celo.local".Info::Url() ?>');
+    });
+    window.addEventListener('message', function(event) {
+
+        $_events.trigger("load");
+
+    }, false);
+    $_events.on("spinner","started",function(){
+        $(".loadingSpinner").css({"display":""});
+    });
+    $_events.on("spinner","ended",function(){
+        $(".loadingSpinner").css({"display":"none"});
+    });
+
+
+    /*******************************************************************/
+    var creatorEditor = new CodeFlask;
+    var displayEditor = new CodeFlask;
+
+
+    $(document).ready(function(){
+        $(this).data("events",$_events);
+        /*******************************************************************/
+        creatorEditor.run('#creatorCode', { language: 'javascript' });
+        creatorEditor.onUpdate(function(code) {
+            $("#creatorCode").data("code",code);
+            $_events.trigger("creator","textchanged");
+        });
+
+
+        /*******************************************************************/
+        displayEditor.run('#displayCode', { language: 'javascript' });
+        displayEditor.onUpdate(function(code) {
+            $("#displayCode").data("code",code);
+            $_events.trigger("display","textchanged");
+        });
+
+        LoadInfo(function(){
+        });
+
+
+    });
+
+    /*******************************************************************/
+    $(window).bind('keydown', function(event) {
+        if (event.ctrlKey || event.metaKey) {
+            switch (String.fromCharCode(event.which).toLowerCase()) {
+                case 's':
+                    event.preventDefault();
+                    $_events.trigger("save");
+                    break;
+                case 'l':
+                    event.preventDefault();
+                    $_events.trigger("load");
+                    break;
+
+            }
+        }
+    });
+    $(".question-editor").on("full-screen-toggle",function(){
+        var body=$("body")
+        if(body.attr("full-screen")){
+            body.removeAttr("full-screen");
+            return;
+        }
+        body.attr("full-screen",true);
+    });
+</script>

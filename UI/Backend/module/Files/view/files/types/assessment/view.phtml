@@ -1,0 +1,13 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Hector
+ * Date: 3/8/2017
+ * Time: 7:21 PM
+ */
+use Application\Info;
+
+/** @var \Application\Model\CourseContent $CourseContentItem */
+
+$Assessment=Info::AssessmentTable()->GetAssessmentForCourseContent($CourseContentItem);
+echo $this->partial("assessments/view",array("Assessment"=>$Assessment));

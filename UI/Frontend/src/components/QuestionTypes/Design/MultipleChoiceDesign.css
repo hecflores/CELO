@@ -1,0 +1,30 @@
+.question {}
+
+.answerable-questions .question-basics .question{
+    font-size:1em;
+    font-weight:bold;
+    margin-top:.5em;
+
+}
+
+.answerable-questions .question-basics .questions{
+    padding:.5em;
+}
+
+.answerable-questions .question-basics .questions .answer-choice{
+    font-size:1.2em;
+
+}
+.answerable-questions .question-basics .questions .answer-choice .answer-choice-selection-btn{
+    padding:.2em .5em;
+    border-radius:5px;
+    margin:.4em .4em;
+    box-shadow:0px 1px 1px rgba(0,0,0,.2);
+    display:inline-block;
+    cursor:pointer;
+
+}
+.answerable-questions .question-basics .questions .answer-choice .answer-choice-selection-btn:hover{
+    background:#0A2463;
+    color:white;
+}

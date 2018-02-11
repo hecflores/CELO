@@ -1,0 +1,110 @@
+<?php
+use Application\Info;
+use Application\Model\Assessment;
+use Application\Model\AssessmentQuestion;
+/**
+ * Created by PhpStorm.
+ * User: Hector
+ * Date: 3/9/2017
+ * Time: 6:18 AM
+ */
+/** @var Assessment $Assessment */
+/** @var AssessmentQuestion[] $AssessmentQuestions */
+if(isset($this->Assessment)){
+    $Assessment=$this->Assessment;
+}
+//
+//$AssessmentQuestions=Info::AssessmentTable()->getAssessmentIssuedQuestions($Assessment);
+
+
+
+//echo "<h1>{$Assessment->getName()}</h1>".
+//     "<h5>{$Assessment->getDescription()}</h5>".
+//     '<button type="button" class="btn btn-primary" data-toggle="modal" id="addBtn">'.
+//     '    Add Question'.
+//     '</button>';
+
+?>
+<div api-component="Assessments" api-fetcher="get" api-parameter-id="<?php echo $Assessment->getAssessmentID() ?>" class="assessment-edit-main-container col-lg-12">
+    <div class="assessment-info col-lg-12">
+        <div class="assessment-name">
+            <div class="action-attribute-label">Assessment Name: </div>
+            <div class="action-attribute-value" api-attribute="Name"></div>
+        </div>
+        <div class="assessment-description">
+            <div class="action-attribute-label">Assessment Description: </div>
+            <div class="action-attribute-value" api-attribute="Description"></div>
+        </div>
+        <div class="assessment-type">
+            <div class="action-attribute-label">Assessment Type: </div>
+            <div class="action-attribute-value" api-attribute="Type"></div>
+        </div>
+        <div class="assessment-timelimit">
+            <div class="action-attribute-label">Assessment Timelimit: </div>
+            <div class="action-attribute-value" api-attribute="Timelimit"></div>
+        </div>
+    </div>
+    <div class="assessment-edit-tool-bar col-lg-12">
+        <div class="btn btn-default assessment-add-question" api-action="add-question">Add Question</div>
+    </div>
+    <div api-render='questions' class="assessment-edit-questions col-lg-12" >
+
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+
+//        var assessentComponent=$('[action-component="Assessments"]');
+//        $("[action-attribute]").$loading_small();
+//
+//        var module=Api[assessentComponent.attr("action-component")];
+//        var id=assessentComponent.attr("action-id");
+//        var updateFunction=function(){
+//            module.get(id,function(data){
+//                $("[action-attribute]").$notloading();
+//
+//                /***********************************************************/
+//                /* Data Attributes                                         */
+//                /***********************************************************/
+//                for(var key in data){
+//                    value=data[key];
+//                    if(value==null){
+//                        value="";
+//                    }
+//
+//                    if(typeof value == "object"){
+//                        continue;
+//                    }
+//                    value=value;
+//                    assessentComponent.find("[action-attribute='"+key+"']").html(value);
+//                }
+//
+//                /***********************************************************/
+//                /* Special Attributes                                      */
+//                /***********************************************************/
+//                assessentComponent.find("[action-special-attribute]").each(function(){
+//                    module.specialAtt[$(this).attr("action-special-attribute")]($(this),data,id);
+//                });
+//
+//                /***********************************************************/
+//                /* Action Links                                            */
+//                /***********************************************************/
+//                assessentComponent.on("click","[action-event]",function(){
+//                    module.events[$(this).attr("action-event")](id);
+//                });
+//
+//                var editQuestions=assessentComponent.find(".assessment-edit-questions");
+//                editQuestions.$loading();
+//                Components.Questions.render(data["questions"],editQuestions);
+//            });
+//        };
+//        module.EventHandler.on("updates",function(){
+//            updateFunction();
+//        });
+//        updateFunction();
+
+    });
+
+</script>
+

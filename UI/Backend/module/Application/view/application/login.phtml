@@ -1,0 +1,38 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Hector
+ * Date: 2/23/2017
+ * Time: 10:35 AM
+ */
+use Application\Info;
+
+?>
+<div class="col-lg-3 "  >
+    <a href='/administrator/login<?php echo Info::RawParameters()  ?>' id="administrator-link-btn" class=" btn btn-block login-form-main">
+        <div class="login-form-title-container">
+            <h3 class="login-form-title">Administrator</h3>
+        </div>
+    </a>
+</div>
+<div class="col-lg-3 "  >
+    <a href='/student/login<?php echo Info::RawParameters()  ?>' id="student-link-btn" class=" btn btn-block login-form-main">
+        <div class="login-form-title-container">
+            <h3 class="login-form-title">Student</h3>
+        </div>
+    </a>
+</div>
+<div class="col-lg-3 "  >
+    <a href='/instructor/login<?php echo Info::RawParameters()  ?>' id="instructor-link-btn" class=" btn btn-block login-form-main">
+        <div class="login-form-title-container">
+            <h3 class="login-form-title">Instructor</h3>
+        </div>
+    </a>
+</div>
+<div class="col-lg-3 "  >
+    <a href='/ta/login<?php echo Info::RawParameters()  ?>' id="ta-link-btn" class=" btn btn-block login-form-main">
+        <div class="login-form-title-container">
+            <h3 class="login-form-title">TA</h3>
+        </div>
+    </a>
+</div>

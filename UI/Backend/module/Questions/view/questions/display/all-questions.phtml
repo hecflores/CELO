@@ -1,0 +1,37 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Hector
+ * Date: 3/9/2017
+ * Time: 6:46 AM
+ */
+
+use Application\Info;
+use Application\Model\Question;
+echo "<a href='/questions/questions/create' class='btn btn-primary '>Add New Question</a>";
+$questions=Info::QuestionsTable()->get();
+echo "<table class='table table-hover'>".
+     "   <thead>".
+     "      <tr>".
+     "         <th>Question</th>".
+     "         <th>Owner</th>".
+     "      </tr>".
+     "   </thead>".
+     "   <tbody>";
+
+/** @var Question $question */
+foreach($questions as $question){
+    $parameters=$question->getParameters();
+    $questionText=$question->getQuestion();
+    ?>
+    <tr questionId='<?php  echo $question->getQuestionID() ?>' onclick='eventManager.trigger("questions","selection","selected",<?php echo  (str_replace("'","&#039;",$question->getDataJSON())) ?>);'>
+        <?php
+    echo "          <td>".$questionText."</td>".
+         "          <td>".$question->getQuestionType()->getName()."</td>".
+         "      </tr>";
+
+
+}
+echo "</tbody>";
+echo "</table>";
+
