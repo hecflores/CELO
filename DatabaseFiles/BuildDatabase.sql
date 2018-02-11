@@ -1,30 +1,38 @@
-USE CELO;
+
+CREATE DATABASE IF NOT EXISTS __DATABASE__;
+
+/*dsdsd*/
 
 
 DROP PROCEDURE  RemoveAllTables;
 DELIMITER //
-CREATE PROCEDURE RemoveAllTables()
+CREATE PROCEDURE RemoveAllTables(IN Init BOOL)
+
   BEGIN
     DECLARE done INT DEFAULT FALSE;
     DECLARE TableName VARCHAR(100);
     DECLARE sqlString VARCHAR(200);
-    DECLARE tablesCursor CURSOR FOR SELECT table_name FROM information_schema.tables where table_schema='CELO';
+    DECLARE tablesCursor CURSOR FOR SELECT table_name FROM information_schema.tables where table_schema='__DATABASE__';
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-    OPEN tablesCursor;
 
-    read_loop: LOOP
-      FETCH tablesCursor INTO TableName;
-      IF done THEN
-        LEAVE read_loop;
-      END IF;
-      SET @sqlString = CONCAT('DROP TABLE ',TableName);
-      PREPARE stmt FROM @sqlString;
-      EXECUTE stmt;
+    IF Init THEN
+      OPEN tablesCursor;
 
-    END LOOP;
+      read_loop: LOOP
+        FETCH tablesCursor INTO TableName;
+        IF done THEN
+          LEAVE read_loop;
+        END IF;
+        SET @sqlString = CONCAT('DROP TABLE ',TableName);
+        PREPARE stmt FROM @sqlString;
+        EXECUTE stmt;
 
-    CLOSE tablesCursor;
+      END LOOP;
+
+      CLOSE tablesCursor;
+
+    END IF;
 
   END;
 //
@@ -33,7 +41,7 @@ DELIMITER ;
 DROP PROCEDURE  RemoveAllViews;
 
 DELIMITER //
-CREATE PROCEDURE RemoveAllViews()
+CREATE PROCEDURE RemoveAllViews(IN Init BOOL)
   BEGIN
     DECLARE done INT DEFAULT FALSE;
     DECLARE ViewName VARCHAR(100);
@@ -41,20 +49,22 @@ CREATE PROCEDURE RemoveAllViews()
     DECLARE viewsCursor CURSOR FOR SELECT TABLE_NAME FROM information_schema.`TABLES` WHERE TABLE_TYPE LIKE 'VIEW' AND TABLE_SCHEMA LIKE 'CELO';
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-    OPEN viewsCursor;
+    IF Init THEN
+      OPEN viewsCursor;
 
-    read_loop: LOOP
-      FETCH viewsCursor INTO ViewName;
-      IF done THEN
-        LEAVE read_loop;
-      END IF;
-      SET @sqlString = CONCAT('DROP VIEW ',ViewName);
-      PREPARE stmt FROM @sqlString;
-      EXECUTE stmt;
+      read_loop: LOOP
+        FETCH viewsCursor INTO ViewName;
+        IF done THEN
+          LEAVE read_loop;
+        END IF;
+        SET @sqlString = CONCAT('DROP VIEW ',ViewName);
+        PREPARE stmt FROM @sqlString;
+        EXECUTE stmt;
 
-    END LOOP;
+      END LOOP;
 
-    CLOSE viewsCursor;
+      CLOSE viewsCursor;
+    END IF;
 
   END;
 //
@@ -63,7 +73,7 @@ DELIMITER ;
 DROP PROCEDURE  RemoveAllForeignKeys;
 
 DELIMITER //
-CREATE PROCEDURE RemoveAllForeignKeys()
+CREATE PROCEDURE RemoveAllForeignKeys(IN Init BOOL)
   BEGIN
     DECLARE done INT DEFAULT FALSE;
     DECLARE TableName VARCHAR(100);
@@ -72,20 +82,22 @@ CREATE PROCEDURE RemoveAllForeignKeys()
     DECLARE foreignKeysCursor CURSOR FOR select constraint_name, table_name from information_schema.table_constraints where constraint_schema = 'CELO' AND constraint_type = 'FOREIGN KEY';
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-    OPEN foreignKeysCursor;
+    IF Init THEN
+      OPEN foreignKeysCursor;
 
-    read_loop: LOOP
-      FETCH foreignKeysCursor INTO ConstraintName, TableName;
-      IF done THEN
-        LEAVE read_loop;
-      END IF;
-      SET @sqlString = CONCAT('ALTER TABLE ',TableName,' DROP FOREIGN KEY ',ConstraintName);
-      PREPARE stmt FROM @sqlString;
-      EXECUTE stmt;
+      read_loop: LOOP
+        FETCH foreignKeysCursor INTO ConstraintName, TableName;
+        IF done THEN
+          LEAVE read_loop;
+        END IF;
+        SET @sqlString = CONCAT('ALTER TABLE ',TableName,' DROP FOREIGN KEY ',ConstraintName);
+        PREPARE stmt FROM @sqlString;
+        EXECUTE stmt;
 
-    END LOOP;
+      END LOOP;
 
-    CLOSE foreignKeysCursor;
+      CLOSE foreignKeysCursor;
+    END IF;
 
   END;
 //
@@ -94,9 +106,9 @@ DELIMITER ;
 
 
 
-CALL RemoveAllForeignKeys;
-CALL RemoveAllViews;
-CALL RemoveAllTables;
+CALL RemoveAllForeignKeys('__INIT_DATABASE__');
+CALL RemoveAllViews('__INIT_DATABASE__');
+CALL RemoveAllTables('__INIT_DATABASE__');
 
 
 
