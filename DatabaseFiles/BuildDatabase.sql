@@ -46,7 +46,7 @@ CREATE PROCEDURE RemoveAllViews(IN Init BOOL)
     DECLARE done INT DEFAULT FALSE;
     DECLARE ViewName VARCHAR(100);
     DECLARE sqlString VARCHAR(200);
-    DECLARE viewsCursor CURSOR FOR SELECT TABLE_NAME FROM information_schema.`TABLES` WHERE TABLE_TYPE LIKE 'VIEW' AND TABLE_SCHEMA LIKE 'CELO';
+    DECLARE viewsCursor CURSOR FOR SELECT TABLE_NAME FROM information_schema.`TABLES` WHERE TABLE_TYPE LIKE 'VIEW' AND TABLE_SCHEMA LIKE '__DATABASE__';
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
     IF Init THEN
@@ -79,7 +79,7 @@ CREATE PROCEDURE RemoveAllForeignKeys(IN Init BOOL)
     DECLARE TableName VARCHAR(100);
     DECLARE sqlString VARCHAR(200);
     DECLARE ConstraintName VARCHAR(100);
-    DECLARE foreignKeysCursor CURSOR FOR select constraint_name, table_name from information_schema.table_constraints where constraint_schema = 'CELO' AND constraint_type = 'FOREIGN KEY';
+    DECLARE foreignKeysCursor CURSOR FOR select constraint_name, table_name from information_schema.table_constraints where constraint_schema = '__DATABASE__' AND constraint_type = 'FOREIGN KEY';
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
     IF Init THEN
