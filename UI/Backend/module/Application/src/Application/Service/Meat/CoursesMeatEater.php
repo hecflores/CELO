@@ -225,7 +225,6 @@ class CoursesMeatEater
             "Description"=>$course["Description"],
             "Type"=>"course",
             "Properties"=>"{'SectionID':'$id'}",
-            "ParentFolderID"=>0,
             "CourseContentNumber" => 0,
             "RootContentID"=>0,
             "Gradable"=>true,
