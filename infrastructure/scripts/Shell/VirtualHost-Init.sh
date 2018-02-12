@@ -58,10 +58,11 @@ echo ""
 
 # Write Virtual Host File
 echo "Setting virtual file '${siteConfigFilePath}'"
+echo $serverPassword | sudo -S rm $siteConfigFilePath
 echo $serverPassword | sudo -S sh -c "echo \"$virtualHostFileContent\" >> $siteConfigFilePath"
 
 # Create new Site Folder and set permissions
-rm -rf $virtualHostFolder
+echo $serverPassword | sudo -S rm -rf $virtualHostFolder
 echo $serverPassword | sudo -S mkdir -p $virtualHostFolder
 echo $serverPassword | sudo -S chmod -R 777 $virtualHostFolder
 
@@ -77,7 +78,7 @@ placeHolderHtml+="</html>\n"
 
 # Create Placeholder if needed
 mkdir -p $virtualHostEntryFolder
-if [ ! -f "${virtualHostEntryFolder}/index.php" -a ! -f "${virtualHostEntryFolder}/index.html" ]; then
+if [ ! -f "${virtualHostEntryFolder}/index.php" -a ! -f "${virtualHostEntryFolder}/index.php" ]; then
 	echo "Putting Placeholder ${virtualHostEntryFolder}/index.html"
 	echo $serverPassword | sudo -S sh -c "echo \"$placeHolderHtml\" >> ${virtualHostEntryFolder}/index.php"
 	echo $serverPassword | sudo -S chmod -R 777 ${virtualHostEntryFolder}/index.php
