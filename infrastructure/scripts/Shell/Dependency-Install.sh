@@ -13,3 +13,5 @@ cd /
 cd $webFolder
 echo "Running Composer on folder $webFolder"
 composer install
+
+

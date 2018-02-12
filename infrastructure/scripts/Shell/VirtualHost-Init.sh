@@ -61,6 +61,7 @@ echo "Setting virtual file '${siteConfigFilePath}'"
 echo $serverPassword | sudo -S sh -c "echo \"$virtualHostFileContent\" >> $siteConfigFilePath"
 
 # Create new Site Folder and set permissions
+rm -rf $virtualHostFolder
 echo $serverPassword | sudo -S mkdir -p $virtualHostFolder
 echo $serverPassword | sudo -S chmod -R 777 $virtualHostFolder
 
@@ -69,7 +70,7 @@ placeHolderHtml=''
 placeHolderHtml+="<html>\n"
 placeHolderHtml+="   <body>\n"
 placeHolderHtml+="   <div style='padding:20px;border-radius:10px;display:inline-block;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);white-space:nowrap;box-shadow:0px 1px 2px rgba(0,0,0,.3), inset 0px 1px 2px rgba(255,255,255,.2);background:#021349;color:white;font-weight:bold'>\n"
-placeHolderHtml+="      <div style='font-size:50px;font-family:serif;letter-spacing:3px'>Currently setting up this site. Comeback later</div>\n"
+placeHolderHtml+="      <div style='font-size:50px;font-family:serif;letter-spacing:3px'>Currently setting up this site.</div>\n"
 placeHolderHtml+="   </div>\n"
 placeHolderHtml+="   </body>\n"
 placeHolderHtml+="</html>\n"
