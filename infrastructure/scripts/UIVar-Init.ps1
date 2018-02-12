@@ -1,14 +1,15 @@
 
-$env:DatabaseName = $env:DatabaseName -replace "[^\w\d_]",""
-Write-Host "##vso[task.setvariable variable=DatabaseName]$env:DatabaseName"
 
-$env:Host = $env:Host -replace "refs\/heads\/",""
-$env:Host = $env:Host -replace "\/","."
-Write-Host "##vso[task.setvariable variable=Host]$env:Host"
+$env:Build_SourceBranch = $env:Build_SourceBranch -replace "refs\/heads\/",""
 
-$env:ServerFolderUpload = $env:ServerFolderUpload -replace "refs\/heads\/",""
-$env:ServerFolderUpload = $env:ServerFolderUpload -replace "\/","_"
-Write-Host "##vso[task.setvariable variable=ServerFolderUpload]$env:ServerFolderUpload"
+$env:BranchNameWithUnderscore = $env:Build_SourceBranch
+$env:BranchNameWithPeriods    = $env:Build_SourceBranch
+
+$env:BranchNameWithPeriods = $env:BranchNameWithPeriods -replace "\/","."
+$env:BranchNameWithUnderscore = $env:BranchNameWithUnderscore -replace "\/","_"
+$env:BranchNameWithUnderscore = $env:BranchNameWithUnderscore -replace "[^\w\d_]","_"
+Write-Host "##vso[task.setvariable variable=BranchNameWithUnderscore]$env:BranchNameWithUnderscore"
+Write-Host "##vso[task.setvariable variable=BranchNameWithPeriods]$env:BranchNameWithPeriods"
 
 $date = Get-Date -Format g 
 Write-Host "##vso[task.setvariable variable=Timestamp]$date"
