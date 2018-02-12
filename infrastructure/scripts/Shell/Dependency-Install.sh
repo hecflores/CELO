@@ -1,9 +1,9 @@
 #!/bin/bash
 args=$#
-if [ $args -ne 3 ]
+if [ $args -ne 1 ]
 then
    echo "   Dependency-Install.sh {webFolder}"
-   exit
+   exit 1
 fi
 
 # ------------------------------------------------------------------------ #

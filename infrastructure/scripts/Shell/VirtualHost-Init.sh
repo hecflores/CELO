@@ -80,6 +80,7 @@ mkdir -p $virtualHostEntryFolder
 if [ ! -f "${virtualHostEntryFolder}/index.php" -a ! -f "${virtualHostEntryFolder}/index.html" ]; then
 	echo "Putting Placeholder ${virtualHostEntryFolder}/index.html"
 	echo $serverPassword | sudo -S sh -c "echo \"$placeHolderHtml\" >> ${virtualHostEntryFolder}/index.php"
+	echo $serverPassword | sudo -S chmod -R 777 ${virtualHostEntryFolder}/index.php
 fi
 
 # Enable the site if needed
