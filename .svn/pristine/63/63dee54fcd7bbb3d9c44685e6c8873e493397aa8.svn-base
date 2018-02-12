@@ -1,2 +1,0 @@
-#!/bin/bash
-/usr/bin/env php ../../public/index.php humusphpunit "$@"
