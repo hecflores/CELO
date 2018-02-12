@@ -76,7 +76,7 @@ placeHolderHtml+="</html>\n"
 
 # Create Placeholder if needed
 mkdir -p $virtualHostEntryFolder
-if [ ! ((-f "${virtualHostEntryFolder}/index.php") -o (-f "${virtualHostEntryFolder}/index.html")) ]; then
+if [ ! -f "${virtualHostEntryFolder}/index.php" -a ! -f "${virtualHostEntryFolder}/index.html" ]; then
 	echo "Putting Placeholder ${virtualHostEntryFolder}/index.html"
 	echo $serverPassword | sudo -S sh -c "echo \"$placeHolderHtml\" >> ${virtualHostEntryFolder}/index.php"
 fi
