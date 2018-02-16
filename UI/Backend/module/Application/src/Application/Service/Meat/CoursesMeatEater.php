@@ -146,7 +146,7 @@ class CoursesMeatEater
 
         $id=Info::PerformInsert("SectionUsers",array(
             "SectionID"=>$parameters["SectionID"],
-            "AddedOn"=>date('m-d-Y H:i:s'),
+            "AddedOn"=>date('Y-m-d H:i:s'),
             "AssignedBy"=>Info::getCurrentUser()->getUserID(),
             "UHID"=>$parameters["UHID"]));
 
