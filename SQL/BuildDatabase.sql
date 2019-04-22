@@ -111,7 +111,7 @@ CREATE PROCEDURE RemoveForeignKey(IN KeyToDelete VARCHAR(100))
     DECLARE TableName VARCHAR(100);
     DECLARE sqlString VARCHAR(200);
     DECLARE ConstraintName VARCHAR(100);
-    DECLARE foreignKeysCursor CURSOR FOR select constraint_name, table_name from information_schema.table_constraints where constraint_schema = '__DATABASE__' AND constraint_type = 'FOREIGN KEY' AND constraint_name = @KeyToDelete;
+    DECLARE foreignKeysCursor CURSOR FOR select constraint_name, table_name from information_schema.table_constraints where constraint_schema = 'Local_CELO_feat_hector_cleanup' AND constraint_type = 'FOREIGN KEY' AND constraint_name = KeyToDelete;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
     OPEN foreignKeysCursor;
@@ -191,10 +191,11 @@ CREATE TABLE IF NOT EXISTS QuestionsPool
 	FOREIGN KEY(UserID) REFERENCES Users(UserID) ON DELETE CASCADE
 
 );
+SET FOREIGN_KEY_CHECKS=1;
+
 CALL RemoveForeignKey('fk_QuestionsPool');
 
-ALTER TABLE QuestionsPool MODIFY COLUMN ParentQuestionPool BIGINT  NULL,
-		ADD CONSTRAINT  fk_QuestionsPool FOREIGN KEY(ParentQuestionPool) REFERENCES QuestionsPool(QuestionsPoolID);
+ALTER TABLE QuestionsPool MODIFY COLUMN ParentQuestionPool BIGINT  NULL, ADD CONSTRAINT  fk_QuestionsPool FOREIGN KEY(ParentQuestionPool) REFERENCES QuestionsPool(QuestionsPoolID);
 	
 
 
