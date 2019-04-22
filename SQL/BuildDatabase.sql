@@ -162,9 +162,10 @@ CREATE TABLE IF NOT EXISTS QuestionsPool
 	FOREIGN KEY(UserID) REFERENCES Users(UserID) ON DELETE CASCADE
 
 );
-ALTER TABLE QuestionsPool MODIFY COLUMN ParentQuestionPool BIGINT  NULL,
-	ADD CONSTRAINT fk_QuestionsPool FOREIGN KEY(ParentQuestionPool) REFERENCES QuestionsPool(QuestionsPoolID);
 
+IF NOT EXISTS (select constraint_name from information_schema.table_constraints WHERE constraint_name = 'fk_QuestionsPool')
+	ALTER TABLE QuestionsPool MODIFY COLUMN ParentQuestionPool BIGINT  NULL,
+		ADD CONSTRAINT  fk_QuestionsPool FOREIGN KEY(ParentQuestionPool) REFERENCES QuestionsPool(QuestionsPoolID);
 
 
 
