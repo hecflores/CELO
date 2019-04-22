@@ -189,7 +189,7 @@ CREATE TABLE IF NOT EXISTS QuestionsPool
 	FOREIGN KEY(UserID) REFERENCES Users(UserID) ON DELETE CASCADE
 
 );
-CALL RemoveForeignKey('fk_QuestionsPool')
+CALL RemoveForeignKey('fk_QuestionsPool');
 
 ALTER TABLE QuestionsPool MODIFY COLUMN ParentQuestionPool BIGINT  NULL,
 		ADD CONSTRAINT  fk_QuestionsPool FOREIGN KEY(ParentQuestionPool) REFERENCES QuestionsPool(QuestionsPoolID);
