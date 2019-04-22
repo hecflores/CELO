@@ -102,7 +102,33 @@ CREATE PROCEDURE RemoveAllForeignKeys(IN Init BOOL)
 //
 DELIMITER ;
 
+CREATE PROCEDURE RemoveForeignKey(IN Key VARCHAR(100))
+  BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE TableName VARCHAR(100);
+    DECLARE sqlString VARCHAR(200);
+    DECLARE ConstraintName VARCHAR(100);
+    DECLARE foreignKeysCursor CURSOR FOR select constraint_name, table_name from information_schema.table_constraints where constraint_schema = '__DATABASE__' AND constraint_type = 'FOREIGN KEY' AND constraint_name = @Key;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
+    OPEN foreignKeysCursor;
+
+    read_loop: LOOP
+    FETCH foreignKeysCursor INTO ConstraintName, TableName;
+    IF done THEN
+        LEAVE read_loop;
+    END IF;
+    SET @sqlString = CONCAT('ALTER TABLE ',TableName,' DROP FOREIGN KEY ',ConstraintName);
+    PREPARE stmt FROM @sqlString;
+    EXECUTE stmt;
+
+    END LOOP;
+
+    CLOSE foreignKeysCursor;
+
+  END;
+//
+DELIMITER ;
 
 
 CALL RemoveAllForeignKeys('__INIT_DATABASE__');
@@ -162,10 +188,11 @@ CREATE TABLE IF NOT EXISTS QuestionsPool
 	FOREIGN KEY(UserID) REFERENCES Users(UserID) ON DELETE CASCADE
 
 );
+CALL RemoveForeignKey('fk_QuestionsPool')
 
-IF NOT EXISTS (select constraint_name from information_schema.table_constraints WHERE constraint_name = 'fk_QuestionsPool')
-	ALTER TABLE QuestionsPool MODIFY COLUMN ParentQuestionPool BIGINT  NULL,
+ALTER TABLE QuestionsPool MODIFY COLUMN ParentQuestionPool BIGINT  NULL,
 		ADD CONSTRAINT  fk_QuestionsPool FOREIGN KEY(ParentQuestionPool) REFERENCES QuestionsPool(QuestionsPoolID);
+	
 
 
 
