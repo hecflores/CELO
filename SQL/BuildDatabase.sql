@@ -102,13 +102,14 @@ CREATE PROCEDURE RemoveAllForeignKeys(IN Init BOOL)
 //
 DELIMITER ;
 
-CREATE PROCEDURE RemoveForeignKey(IN Key VARCHAR(100))
+DELIMITER //
+CREATE PROCEDURE RemoveForeignKey(IN KeyToDelete VARCHAR(100))
   BEGIN
     DECLARE done INT DEFAULT FALSE;
     DECLARE TableName VARCHAR(100);
     DECLARE sqlString VARCHAR(200);
     DECLARE ConstraintName VARCHAR(100);
-    DECLARE foreignKeysCursor CURSOR FOR select constraint_name, table_name from information_schema.table_constraints where constraint_schema = '__DATABASE__' AND constraint_type = 'FOREIGN KEY' AND constraint_name = @Key;
+    DECLARE foreignKeysCursor CURSOR FOR select constraint_name, table_name from information_schema.table_constraints where constraint_schema = '__DATABASE__' AND constraint_type = 'FOREIGN KEY' AND constraint_name = @KeyToDelete;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
     OPEN foreignKeysCursor;
