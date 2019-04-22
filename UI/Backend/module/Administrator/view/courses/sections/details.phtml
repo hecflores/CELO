@@ -1,0 +1,183 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Hector
+ * Date: 2/23/2017
+ * Time: 7:15 PM
+ */
+use Application\Info;
+use Application\Model\Section;
+/** @var Section $section */
+
+?>
+<script>
+    var $sectionID='<?php echo $section->getSectionID();  ?>';
+    var $url='<?php echo Info::Url();  ?>';
+</script>
+<div class="pretty-box">
+    <h2><?php echo $course->getCourseCategory()." ".$course->getCourseID()." - ".$course->getCourseName()  ?></h2>
+    <h5><?php echo $course->getDescription()  ?></h5>
+</div>
+<?php
+
+
+$instructors=Info::SectionUsersTable()->getUsersForSections($section,array("Role"=>"Instructor"));
+$tas=Info::SectionUsersTable()->getUsersForSections($section,array("Role"=>"TA"));
+$students=Info::SectionUsersTable()->getUsersForSections($section,array("Role"=>"Student"));
+
+?>
+<div class="mainContent">
+<!-- I n s t r u c t o r s  -->
+<div class="panel panel-default">
+    <div class="panel-heading"><h2>Instructors <span class="addInstructor btn btn-primary">Add Instructor</span></h2></div>
+    <div class="panel-body">
+    </div>
+    <!-- Table -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone Number</th>
+                <th>UserName</th>
+                <th>Password</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody class="instructorsTable">
+
+        <?php
+
+foreach($instructors as $instructor){
+
+    echo "<tr>";
+    echo '    <th><b class="glyphicon glyphicon-user"></b>'.$instructor->getFirstName()." ".$instructor->getLastName()."</th>";
+    echo '    <th>'.$instructor->getEmail()."</th>";
+    echo '    <th>'.$instructor->getPhoneNumber()."</th>";
+    echo '    <th>'.$instructor->getUserName()."</th>";
+    echo '    <th>'.$instructor->getPassword()."</th>";
+    echo '    <th>'.$instructor->getFirstName()." ".$instructor->getLastName()."</th>";
+    echo "</tr>";
+}
+?>
+
+        </tbody>
+    </table>
+</div>
+
+<!-- T e a c h i n g   A s s i s t a n t s   -->
+<div class="panel panel-default">
+    <div class="panel-heading"><h2>Teaching Assistents(<em>TA</em>) <span class="addTA btn btn-primary">Add TA</span></h2></div>
+    <div class="panel-body">
+    </div>
+    <!-- Table -->
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone Number</th>
+            <th>UserName</th>
+            <th>Password</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody class="taTable">
+
+        <?php
+
+        foreach($tas as $ta){
+
+            echo "<tr>";
+            echo '    <th><b class="glyphicon glyphicon-user"></b>'.$ta->getFirstName()." ".$ta->getLastName()."</th>";
+            echo '    <th>'.$ta->getEmail()."</th>";
+            echo '    <th>'.$ta->getPhoneNumber()."</th>";
+            echo '    <th>'.$ta->getUserName()."</th>";
+            echo '    <th>'.$ta->getPassword()."</th>";
+            echo '    <th>'.$ta->getFirstName()." ".$ta->getLastName()."</th>";
+            echo "</tr>";
+        }
+        ?>
+
+        </tbody>
+    </table>
+</div>
+
+<!-- S t u d e n t s  -->
+<div class="panel panel-default">
+<div class="panel-heading"><h2>Students <span class="addStudent btn btn-primary">Enroll Student</span></h2></div>
+<div class="panel-body">
+</div>
+<!-- Table -->
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone Number</th>
+            <th>UserName</th>
+            <th>Password</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody class="instructorsTable">
+
+        <?php
+
+        foreach($students as $student){
+
+            echo "<tr>";
+            echo '    <th><b class="glyphicon glyphicon-user"></b>'.$student->getFirstName()." ".$student->getLastName()."</th>";
+            echo '    <th>'.$student->getEmail()."</th>";
+            echo '    <th>'.$student->getPhoneNumber()."</th>";
+            echo '    <th>'.$student->getUserName()."</th>";
+            echo '    <th>'.$student->getPassword()."</th>";
+            echo '    <th>'.$student->getFirstName()." ".$student->getLastName()."</th>";
+            echo "</tr>";
+        }
+        ?>
+
+        </tbody>
+    </table>
+</div>
+</div>
+<script>
+
+
+    function Reload()
+    {
+        window.location.reload();
+//        $(".mainContent").html("<span class='spinner' style='width:50px;height:50px;left:50%'></span>");
+//        $.get($url,{ajax:true},function(data){
+//            $(".mainContent").html(data);
+//        });
+    }
+
+    $(".addInstructor").click(function(){
+        Users.search({Role:Users.Roles.INSTRUCTOR}).done(function(user){
+            $.post("/api/sections/"+$sectionID+"/add/user",{UserID:user.UserID()},function(){
+                //alert("<h1 class='text-success'>Successfully added "+user.UserName()+"");
+                Reload();
+
+            });
+        });
+    });
+    $(".addStudent").click(function(){
+        Users.search({Role:Users.Roles.STUDENT}).done(function(user){
+            $.post("/api/sections/"+$sectionID+"/add/user",{UserID:user.UserID()},function(){
+                //alert("<h1 class='text-success'>Successfully added "+user.UserName()+"");
+                Reload();
+            });
+        });
+    });
+    $(".addTA").click(function(){
+        Users.search({Role:Users.Roles.TA}).done(function(user){
+            $.post("/api/sections/"+$sectionID+"/add/user",{UserID:user.UserID()},function(){
+                //alert("<h1 class='text-success'>Successfully added "+user.UserName()+"");
+                Reload();
+            });
+        });
+    });
+
+
+</script>

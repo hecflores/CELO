@@ -1,0 +1,16 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Hector
+ * Date: 3/8/2017
+ * Time: 8:36 PM
+ */
+use Application\Info;
+
+/** @var \Application\Model\CourseContent $CourseContentItem */
+
+$CourseContentItem=$this->CourseContentItem;
+$contentType=$CourseContentItem->getProperties()["File"]["Type"];
+header("Content-Type: $contentType");
+
+echo file_get_contents($CourseContentItem->getProperties()["File"]["Path"]);

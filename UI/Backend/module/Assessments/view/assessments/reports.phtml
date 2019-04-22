@@ -1,0 +1,52 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Hector
+ * Date: 3/9/2017
+ * Time: 6:54 PM
+ */
+use Application\Info;
+
+
+?>
+<div api-component="RunningAssessments" api-fetcher="getAll">
+    <div api-array-template api-attribute-link="urls->view">
+        <div class="running-assessments-item"  >
+            <div api-attribute="AnsweredID" class="report-item-answered-id"></div>
+            <div api-attribute="Grade" class="report-item-grade"></div>
+            <div class="grade-ratio">
+                (<div api-attribute="EarnedPoints" class="earned-points"></div>/
+                <div api-attribute="TotalPoints" class="total-points"></div>)
+            </div>
+        </div>
+    </div>
+</div>
+<div class="assessment-report-home col-lg-12">
+    <a class="go-home btn btn-default" href="/">Go Home</a>
+</div>
+
+<?php
+return;
+echo "<table style='font-size:26px' class='table'>";
+echo "   <thead>";
+echo "       <tr>";
+echo "           <th>Assessment ID</th>";
+echo "           <th>Answered ID</th>";
+echo "           <th>Start Time</th>";
+echo "           <th>End Time</th>";
+echo "           <th>Grade</th>";
+echo "       </tr>";
+echo "   <thead>";
+echo "   <tbody>";
+foreach(Info::AssessmentTable()->getFinishedAssessments(Info::getCurrentUser()) as $assessment){
+    echo "<tr >";
+    echo "    <td>{$assessment->getAssessmentID()}</td>";
+    echo "    <td>{$assessment->getAnsweredID()}</td>";
+    echo "    <td>{$assessment->getStartTime()}</td>";
+    echo "    <td>{$assessment->getEndTime()}</td>";
+    echo "    <td><b >{$assessment->getGrade()}</b></td>";
+    echo "</tr>";
+}
+echo "   </tbody>";
+echo "</table>";
+
