@@ -460,6 +460,7 @@ CREATE TABLE IF NOT EXISTS AnsweredQuestions(
 
 
 DELIMITER //
+DROP TRIGGER IF EXISTS AnswerableQuestionsNumberTracker //
 CREATE TRIGGER AnswerableQuestionsNumberTracker
 BEFORE INSERT ON AnswerableQuestions
 FOR EACH ROW
@@ -474,6 +475,7 @@ FOR EACH ROW
 DELIMITER ;
 
 DELIMITER //
+DROP TRIGGER IF EXISTS AnsweredQuestionsNumberTracker //
 CREATE TRIGGER AnsweredQuestionsNumberTracker
 BEFORE INSERT ON AnsweredQuestions
 FOR EACH ROW
