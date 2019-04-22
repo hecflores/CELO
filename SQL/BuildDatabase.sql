@@ -286,7 +286,6 @@ CREATE TABLE IF NOT EXISTS Sections
 
 );
 
-DELETE FROM Courses;
 /**************************************************************************/
 /* Section Users                                                          */
 /**************************************************************************/
@@ -344,7 +343,7 @@ CREATE TABLE IF NOT EXISTS Invitation
 /**************************************************************************/
 
 SET FOREIGN_KEY_CHECKS=1;
-
+CALL RemoveForeignKey('fk_ParentFolderID');
 ALTER TABLE CourseContent
 	ADD CONSTRAINT fk_ParentFolderID
 FOREIGN KEY(SectionID) REFERENCES Sections(SectionID) ON DELETE CASCADE;
