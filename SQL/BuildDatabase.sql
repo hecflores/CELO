@@ -642,6 +642,7 @@ DELIMITER //
 /***************************************************************************/
 
 DELIMITER //
+DROP TRIGGER IF EXISTS CourseContentNumberTracker //
 CREATE TRIGGER CourseContentNumberTracker
 BEFORE INSERT ON CourseContent
 FOR EACH ROW
@@ -694,6 +695,8 @@ DELIMITER ;
 #   END//
 #
 #
+
+DROP VIEW IF EXISTS UsersAnswersTemp;
 CREATE VIEW `UsersAnswersTemp` AS
 	SELECT
 	`S8`.`AnswerableID` AS `AnswerableID`,
@@ -718,6 +721,7 @@ CREATE VIEW `UsersAnswersTemp` AS
 /***************************************************************************/
 /***************************************************************************/
 /***************************************************************************/
+DROP VIEW IF EXISTS AnsweredQuestionsCombo;
 CREATE VIEW `AnsweredQuestionsCombo` AS
 	SELECT
 	`S1`.`AnswerableID`                                    AS `AnswerableID`,
@@ -749,6 +753,8 @@ CREATE VIEW `AnsweredQuestionsCombo` AS
 	FROM ((`AnswerableQuestions` `S1` LEFT JOIN `AnsweredQuestions` `S5`
 		ON ((`S5`.`AnswerableID` = `S1`.`AnswerableID`))) LEFT JOIN `AnsweringQuestionsGroup` `S6`
 		ON ((`S6`.`AnsweringGroupID` = `S5`.`AnsweringGroupID`)));
+
+DROP VIEW IF EXISTS AnsweredQuestionsReport;
 CREATE VIEW `AnsweredQuestionsReport` AS
 	SELECT
 	`S1`.`AnswerableID`                                    AS `AnswerableID`,
@@ -855,6 +861,8 @@ CREATE VIEW `AnsweredQuestionsReport` AS
 																								`S12`.`AnsweringGroupID`)))
 																							WHERE (`S12`.`AnswerableID` =
 																								`S1`.`AnswerableID`)))));
+
+DROP VIEW IF EXISTS CourseContentBreadcrumbs;
 CREATE VIEW `CourseContentBreadcrumbs` AS
 	SELECT
 	`S2`.`ContentID`      AS `ContentID`,
@@ -875,6 +883,8 @@ CREATE VIEW `CourseContentBreadcrumbs` AS
 	`S1`.`RolesVisible`   AS `RolesVisible`
 	FROM (`CourseContentChildren` `S2`
 	JOIN `CourseContent` `S1` ON ((`S1`.`ContentID` = `S2`.`ContentID`)));
+
+DROP VIEW IF EXISTS CourseContentBreadcrumbsForward;
 CREATE VIEW `CourseContentBreadcrumbsForward` AS
 	SELECT
 	`S2`.`ContentID`      AS `ContentID`,
@@ -895,6 +905,8 @@ CREATE VIEW `CourseContentBreadcrumbsForward` AS
 	`S1`.`RolesVisible`   AS `RolesVisible`
 	FROM (`CourseContentChildren` `S2`
 	JOIN `CourseContent` `S1` ON ((`S1`.`ContentID` = `S2`.`ChildContentID`)));
+
+DROP VIEW IF EXISTS CourseContentReport;
 CREATE VIEW `CourseContentReport` AS
 	SELECT
 	`S3`.`CourseUniqueID`      AS `CourseUniqueID`,
@@ -937,6 +949,8 @@ CREATE VIEW `CourseContentReport` AS
 		ON ((`S1`.`SectionID` = `S2`.`SectionID`))) LEFT JOIN `Users` `S4`
 		ON ((`S4`.`UserID` = `S2`.`CreatedBy`))) LEFT JOIN `Courses` `S3`
 		ON ((`S3`.`CourseUniqueID` = `S2`.`CourseUniqueID`)));
+
+DROP VIEW IF EXISTS CourseSectionsReport;
 CREATE VIEW `CourseSectionsReport` AS
 	SELECT
 	`S1`.`CourseUniqueID`       AS `CourseUniqueID`,
@@ -972,6 +986,8 @@ CREATE VIEW `CourseSectionsReport` AS
 		ON ((`S2`.`SectionID` = `S3`.`SectionID`))) LEFT JOIN `Users` `S4`
 		ON (((isnull(`S3`.`UserID`) AND (`S3`.`UHID` = `S4`.`UHID`)) OR
 			((`S3`.`UserID` IS NOT NULL) AND (`S3`.`UserID` = `S4`.`UserID`)))));
+
+DROP VIEW IF EXISTS GradeProgress_CourseContentTree;
 CREATE VIEW `GradeProgress_CourseContentTree` AS
 	SELECT
 	`S1`.`ContentID`                                                          AS `ContentID`,
@@ -989,6 +1005,8 @@ CREATE VIEW `GradeProgress_CourseContentTree` AS
 		ON ((`S3`.`AnswerableGroupID` = `S2`.`AnswerableGroupID`))) JOIN `Users` `S7`
 	WHERE (`S7`.`UserID` = `S3`.`UserID`)
 	GROUP BY `S1`.`ContentID`, `S1`.`ChildContentID`, `S1`.`Name`, `S1`.`Type`, `S1`.`Depth`, `S7`.`UserID`;
+
+DROP VIEW IF EXISTS QuestionsReport;
 CREATE VIEW `QuestionsReport` AS
 	SELECT
 	`S1`.`QuestionID`      AS `QuestionID`,
