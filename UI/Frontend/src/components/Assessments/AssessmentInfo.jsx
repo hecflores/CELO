@@ -11,7 +11,7 @@ class AssessmentInfo extends CourseContentGenericRenderDecider{
     renderEditableMode(){
         return <div className="">
 
-            <ImportPropertyTrueFalse Title={"Make the link available"} Id={"available"} {...this.props}/>
+            <ImportPropertyTrueFalse Title={"Makes the link available"} Id={"available"} {...this.props}/>
             <ImportPropertyTrueFalse Title={"Add a new announcement for this test"} Id={"announcement"} {...this.props}/>
             <ImportPropertyTrueFalse Title={"Force Completion"} Id={"forceCompletion"} {...this.props}/>
             <ImportPropertyTrueFalse Title={"Allow Multiple Attempts"} Id={"allowMultipleAttempts"} {...this.props}/>

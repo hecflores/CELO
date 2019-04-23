@@ -14,7 +14,7 @@ Instructions on Setting Environment
 
 
 
-#### PHP Storm(IDE)
+#### 1. PHP Storm(IDE)
   1. Get the _Educational License_ account for 1 year by [going here to sign up](https://www.jetbrains.com/shop/eform/students).
   2. Download [PHP Storm](https://www.jetbrains.com/phpstorm/) and install. 
   3. Login for the license with the credentials in `1.`
@@ -23,26 +23,20 @@ Instructions on Setting Environment
 
 
 
-#### Batch Files that made my life easy
- 1. `start_react` - Will start the Front end continues building (_npm start_) basicly, just without the need of finding the front end folder.
-    Which is in [module/React/src/React/FrontEnd](https://github.com/hecflores/CELO/tree/master/module/React/src/React/FrontEnd).
- 2. `debug_on`/`debug_off` - Will stop the Wamp server and restart them with the debug on or off. Explanation on the debug part is later on.
- 3. At this time open up the terminal and type `start start_react`
-  
-#### Setting Up Local Server
+#### 2. Setting Up Local Server
  1. Download [Wamp](http://www.wampserver.com/en/)
  2. Install...
  3. Start Wamp...
  4. You will know if it is working if [localhost](http://localhost) works.
  5. [Modify the host file](https://support.rackspace.com/how-to/modify-your-hosts-file/) by putting the following:
  
-        localhost uh-celo.local
- 6. Add uh-celo.local to the vhost file `{WAMP FOLDER}\apache\apache2.4.23\conf\extra\httpd-vhosts.conf`
+        127.0.0.1      uh-celo.local
+ 6. Add **uh-celo.local** to the vhost file `{WAMP FOLDER}\bin\apache\apache2.4.23\conf\extra\httpd-vhosts.conf`
  
         <VirtualHost *:80>
             ServerName uh-celo.local
-            DocumentRoot {CELO FOLDER}/public
-            <Directory  "{CELO FOLDER}/public">
+            DocumentRoot {CELO FOLDER}/UI/Backend/public
+            <Directory  "{CELO FOLDER}/UI/Backend/public">
                 Options +Indexes +Includes +FollowSymLinks +MultiViews
                 AllowOverride All
                 Require local
@@ -51,6 +45,35 @@ Instructions on Setting Environment
  7. Restart WAMP
  8. Browse to [uh-celo.local](http://uh-celo.local)
  
+ #### 3. Add PHP to path
+   1. Add the path to the latest php folder in wamp to PATH
+      https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/
+   
+   
+ #### 4. Install & Run Composer
+  1. Install [Composer](https://getcomposer.org/download/)
+  2. Run `php composer.phar install` in directory `UI/Backend`
+     
+         ...
+         Generating autoload files
+         
+ #### 5. Set PHP Version for Wamp
+  1. Run the following command in the folder `{WAMP FOLDER}/scripts`
+         
+         php .\switchPhpVersion.php 7.0.33
+         php .\refresh.php
+         net stop wampapache64
+         net start wampapache64
+
+ #### 6. Run NPM & Pack JS Files
+  1. Run the following command in the folder `UI/Frontend`
+         
+         npm install 
+         .\node_modules\.bin\webpack src/app.js
+         
+ #### 7. Setup Local DB
+  ... To be continued ...
+              
 #### Setting Up Debugging Environment (Optional) - But Helpful! 
  1. Use [Google Chrome](https://www.google.com/chrome/browser/desktop/index.html?brand=CHBD&gclid=Cj0KCQjwytLKBRCXARIsAPchlXoS_a52XSOJrZy6i6433r4T5HY1DRlc_phaVSsIMy2G0BkmDjcn_KEaAmk6EALw_wcB) as the browser
  2. Download [EditThisCookie](https://chrome.google.com/webstore/detail/editthiscookie/fngmhnnpilhplaeedifhccceomclgfbg?hl=en)
@@ -70,6 +93,7 @@ Instructions on Setting Environment
  6. After Opening the Project click the top right button ![Start Listening for PHP Debugger Connection](https://www.jetbrains.com/help/img/idea/2017.1/start_listening_php_debug_connections.png) (_Start Listening for PHP Debugger Connection_)
  7. Then just Refresh and it should stop inside of the code in the IDE.
  8. Read more about this [here](https://www.jetbrains.com/help/phpstorm/zero-configuration-debugging.html).
+ 
  
 #### Important Code Locations
   - React(Front End Code) : [/module/React/src/React/FrontEnd](https://github.com/hecflores/CELO/tree/master/module/React/src/React/FrontEnd)
