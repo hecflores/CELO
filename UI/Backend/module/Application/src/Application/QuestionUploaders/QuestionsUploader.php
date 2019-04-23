@@ -83,7 +83,15 @@ class QuestionsUploader
         /* Get the ID                                                      */
         /*******************************************************************/
         $id=uniqid();
-
+		if (!file_exists('data')) {
+			mkdir('data', 0777, true);
+		}
+		if (!file_exists('data/Questions')) {
+			mkdir('data/Questions', 0777, true);
+		}
+		if (!file_exists('data/Questions/QuestionCollections')) {
+			mkdir('data/Questions/QuestionCollections', 0777, true);
+		}
         /*******************************************************************/
         /* Fix the Folder                                                  */
         /*******************************************************************/

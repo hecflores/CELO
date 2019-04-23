@@ -59,9 +59,16 @@ class FileContent
         return $this->Type;
     }
     protected static function FindAvailableFileName($extension){
+		if (!file_exists('data')) {
+			mkdir('data', 0777, true);
+		}
+		if (!file_exists('data/Files')) {
+			mkdir('data/Files', 0777, true);
+		}
         $folder="data/Files";
         $files = glob($folder . "*.$extension");
         $index=count($files);
+		
         while(file_exists("$folder/File$index.$extension")){
             $index++;
         }
