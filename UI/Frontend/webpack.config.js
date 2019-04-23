@@ -4,7 +4,7 @@ var config = {
     entry: './src/app.js',
 
     output: {
-        path:'output',
+        path:path.resolve('../Backend/public/resources'),
         filename: 'index.js',
     },
 

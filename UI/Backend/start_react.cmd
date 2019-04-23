@@ -1,5 +1,5 @@
 echo off
-pushd module\React\src\React\FrontEnd
+pushd ..\Frontend
 echo /********************************************************/
 echo /* Starting Watch of React Code                         */
 echo /*                                                      */
